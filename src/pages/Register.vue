@@ -59,7 +59,7 @@
               -->
             <q-input
               filled
-              v-model.trim="userDetails.emailAddress"
+              v-model.trim="userDetails.email"
               type="email"
               label="Email Address"
               class="q-mb-md"
@@ -148,6 +148,32 @@
     </div>
   </div>
 </template>
+<script>
+export default {
+  data() {
+    return {
+      userDetails: {
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+        gender: "Female",
+        rememberMe: false
+      },
+
+      isPwd: true,
+      validEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    };
+  },
+  methods: {
+    register() {
+      const formData = this.userDetails;
+      this.$store.dispatch("register", formData);
+    }
+  }
+};
+</script>
+
 <style scoped>
 .logoAlt {
   display: flex;
@@ -182,22 +208,3 @@
   padding-bottom: 1rem;
 }
 </style>
-<script>
-export default {
-  data() {
-    return {
-      userDetails: {
-        name: "",
-        emailAddress: "",
-        password: "",
-        phone: "",
-        gender: "Female",
-        rememberMe: false
-      },
-
-      isPwd: true,
-      validEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    };
-  }
-};
-</script>

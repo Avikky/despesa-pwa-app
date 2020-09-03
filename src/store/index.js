@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-// import example from './module-example'
+import user from '../store/users'
 
 Vue.use(Vuex)
 
@@ -14,10 +14,10 @@ Vue.use(Vuex)
  * with the Store instance.
  */
 
-export default function (/* { ssrContext } */) {
-  const Store = new Vuex.Store({
+export default function ( /* { ssrContext } */ ) {
+  const store = new Vuex.Store({
     modules: {
-      // example
+      user,
     },
 
     // enable strict mode (adds overhead!)
@@ -25,5 +25,5 @@ export default function (/* { ssrContext } */) {
     strict: process.env.DEV
   })
 
-  return Store
+  return store
 }

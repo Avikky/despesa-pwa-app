@@ -8,7 +8,7 @@
         </div>
         <div class="balance">
           <span class="naira-sign medium-text" v-html="nairaSign"></span>
-          <span class="amount big-text">{{ openingBal }}</span>
+          <span class="amount big-text">{{ availableIncome }}</span>
         </div>
         <div class="crudBtn q-gutter-md">
           <q-btn
@@ -28,34 +28,7 @@
           />
         </div>
       </div>
-      <!-- Dialog for adding and editting Opening Balance -->
-      <q-dialog v-model="prompt" persistent>
-        <q-card style="min-width: 350px">
-          <q-card-section>
-            <div class="text-h6">Add Opening Balance</div>
-          </q-card-section>
 
-          <q-card-section class="q-pt-none">
-            <q-input dense v-model="openingBal" autofocus />
-          </q-card-section>
-
-          <q-card-actions align="right" class="text-primary">
-            <q-btn
-              v-if="editMode"
-              flat
-              label="Edit"
-              @click="responseDialog = true"
-            />
-            <q-btn
-              v-if="!editMode"
-              flat
-              label="Add"
-              @click="responseDialog = true"
-            />
-            <q-btn flat label="Cancle" v-close-popup />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
       <!-- Dialop for to display response from first dialog -->
       <q-dialog
         v-model="responseDialog"
@@ -73,48 +46,48 @@
           </q-card-section>
 
           <q-card-actions align="right" class="bg-white text-teal">
-            <q-btn flat label="OK" @click="closeAllModal" />
+            <q-btn flat label="OK" v-close-popup />
           </q-card-actions>
         </q-card>
       </q-dialog>
     </div>
     <div class="q-my-lg row q-gutter-lg" style="width: 80%; margin: 1rem auto;">
       <div class="col-md-3">
-        <q-form @submit.prevent="createExpenses">
+        <q-form @submit.prevent="createIncome">
           <q-card>
             <q-card-section>
               <q-select
                 outlined
-                v-model="expenses.category"
-                :options="categories"
+                v-model="income.customer"
+                :options="customers"
                 label="Expense Category"
               />
               <br />
               <q-input
                 outlined
                 type="text"
-                v-model.trim="expenses.title"
+                v-model.trim="income.title"
                 label="Title"
               />
               <br />
               <q-input
                 outlined
                 type="text"
-                v-model.trim="expenses.description"
+                v-model.trim="income.description"
                 label="Description"
               />
               <br />
               <q-input
                 outlined
                 type="number"
-                v-model.trim="expenses.amount"
+                v-model.trim="income.amount"
                 label="Amount"
               />
               <br />
               <q-input
                 outlined
                 type="text"
-                v-model.trim="expenses.made_by"
+                v-model.trim="income.made_by"
                 label="Made By"
               />
               <br />
@@ -197,28 +170,23 @@ export default {
       editMode: false,
       searchExpense: "",
       responseDialog: false,
-      prompt: false,
       date: {
         day: "",
         month: ""
       },
-      openingBal: "100,000",
-      categories: ["Fuel", "Transport", "Photocopy"],
-      expenses: {
-        category: "",
-        title: "",
+      availableIncome: "100,000",
+      customers: ["Fuel", "Transport", "Photocopy"],
+      income: {
+        source: "customer",
+        customer_id: "",
+        type: "",
         description: "",
         amount: "",
-        made_by: ""
+        mop: ""
       }
     };
   },
-  methods: {
-    closeAllModal() {
-      this.prompt = false;
-      this.responseDialog = false;
-    }
-  },
+  methods: {},
   mounted() {
     this.closeAllModal();
   }

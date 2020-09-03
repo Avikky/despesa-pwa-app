@@ -9,6 +9,9 @@ export default {
 };
 </script>
 <style>
+#q-app {
+  background: #f5f5f5;
+}
 .logoAlt {
   display: flex;
   justify-content: left;

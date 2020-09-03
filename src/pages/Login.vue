@@ -17,15 +17,19 @@
         />
         <h3 class="text-center text-weight-bold">Expensa</h3>
       </div>
-      <p class="welcome-text">Welcome Back, Login to your Dashboard</p>
-      <q-form @submit.prevent="logIn" class="q-mx-xl">
+      <p class="welcome-text" v-if="user.length > 0">
+        Hi <span class="text-blue-12">{{ user }}</span
+        >, kindly Login to your Dashboard
+      </p>
+      <p class="welcome-text" v-else>Welcome Back, Login to your Dashboard</p>
+      <q-form @submit.prevent="login" class="q-mx-xl">
         <q-card>
           <q-card-section>
             <!-- email address goes here
               -->
             <q-input
               filled
-              v-model.trim="userDetails.emailAddress"
+              v-model.trim="loginDetails.email"
               type="email"
               label="Email Address"
               class="q-mb-md"
@@ -40,7 +44,7 @@
             </q-input>
             <!-- password goes here -->
             <q-input
-              v-model.trim="userDetails.password"
+              v-model.trim="loginDetails.password"
               label="Password"
               class="q-mb-md"
               filled
@@ -66,9 +70,9 @@
         <div class="q-mt-md">
           <q-checkbox
             class="text-weight-light q-mb-sm text-grey-7"
-            v-model="userDetails.rememberMe"
+            v-model="rememberMe"
             label="Remember me"
-            @click="userDetails.rememberMe = !userDetails.rememberMe"
+            @click="rememberMe = !rememberMe"
           ></q-checkbox>
         </div>
         <div class="loginBtn q-gutter-lg-x-lg">
@@ -78,7 +82,11 @@
             color="blue-14"
             type="submit"
             label="Login Now"
-          />
+          >
+            <template v-slot:loading>
+              <q-spinner />
+            </template>
+          </q-btn>
           <span class="forgotPass text-grey-8" to="/password-recovery"
             ><router-link class="link" to="/password-recovery"
               >Forgot Password?</router-link
@@ -94,6 +102,46 @@
     </div>
   </div>
 </template>
+<script>
+import store from "../store";
+export default {
+  data() {
+    return {
+      //submitting: this.$store.state.loadingBtn,
+      rememberMe: false,
+      user: "",
+      loginDetails: {
+        email: "",
+        password: ""
+        // rememberMe: false
+      },
+
+      isPwd: true,
+      validEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    };
+  },
+  methods: {
+    login() {
+      let formData = this.loginDetails;
+      this.$store.dispatch("login", formData);
+    },
+    checkIfComingFromRegistra() {
+      //console.log(this.$store.getters.newUser);
+      if (
+        this.$store.getters.newUser.username &&
+        this.$store.getters.newUser.email
+      ) {
+        this.loginDetails.email = this.$store.getters.newUser.email;
+        this.user = this.$store.getters.newUser.username;
+      }
+    }
+  },
+  created() {
+    this.checkIfComingFromRegistra();
+  }
+};
+</script>
+
 <style scoped>
 .logoAlt {
   display: flex;
@@ -127,19 +175,3 @@
   padding-bottom: 1rem;
 }
 </style>
-<script>
-export default {
-  data() {
-    return {
-      userDetails: {
-        emailAddress: "",
-        password: "",
-        rememberMe: false
-      },
-
-      isPwd: true,
-      validEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    };
-  }
-};
-</script>

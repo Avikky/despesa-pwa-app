@@ -3,6 +3,12 @@ import VueRouter from 'vue-router'
 
 import routes from './routes'
 
+
+import {
+  Cookies
+} from 'quasar';
+
+
 Vue.use(VueRouter)
 
 /*
@@ -14,9 +20,12 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function (/* { store, ssrContext } */) {
+export default function ( /* { store, ssrContext } */ ) {
   const Router = new VueRouter({
-    scrollBehavior: () => ({ x: 0, y: 0 }),
+    scrollBehavior: () => ({
+      x: 0,
+      y: 0
+    }),
     routes,
 
     // Leave these as they are and change in quasar.conf.js instead!
@@ -25,6 +34,22 @@ export default function (/* { store, ssrContext } */) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
   })
+
+  Router.beforeEach((to, from, next) => {
+    var isAuthed = !!Cookies.get('jwt_token');
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (!isAuthed) {
+        return next({
+          path: "/login",
+          params: {
+            nextUrl: to.fullPath
+          }
+        });
+      }
+
+    }
+    next();
+  });
 
   return Router
 }

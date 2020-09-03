@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hhr lpr ffR" style="height: 500px">
     <q-header class="bg-white shadow-1">
       <q-toolbar id="main-header" class="text-black">
         <q-toolbar-title>
@@ -17,7 +17,7 @@
             </h5>
           </div>
         </q-toolbar-title>
-        <q-tabs shrink class="gt-sm">
+        <!-- <q-tabs shrink class="gt-sm">
           <q-route-tab name="home" label="Home" to="/home"></q-route-tab>
           <q-route-tab
             name="expenses"
@@ -36,17 +36,8 @@
             label="file-manager"
             to="/file-manager"
           ></q-route-tab>
-        </q-tabs>
+        </q-tabs> -->
         <q-space />
-        <q-btn
-          class="gt-sm"
-          size="15px"
-          color="red-7"
-          glossy
-          icon="fas fa-user-circle"
-          label="Logout"
-          to="#"
-        />
         <div class="gt-sm text-black"><small>Expense tracking app</small></div>
         <q-btn
           id="menu-icon"
@@ -54,6 +45,7 @@
           flat
           dense
           round
+          show-if-above
           icon="menu"
           aria-label="Menu"
           @click="drawerRight = !drawerRight"
@@ -81,6 +73,7 @@
           :key="link.title"
           v-bind="link"
         />
+        <br />
         <q-item>
           <q-item-section>
             <q-btn
@@ -98,7 +91,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <q-page padding>
+        <router-view />
+      </q-page>
     </q-page-container>
     <!-- <q-footer class="text-center text-grey-5">
       <q-toolbar class="bg-white">
@@ -135,6 +130,11 @@ const linksData = [
     link: "/report"
   },
   {
+    title: "Customers",
+    icon: "fas fa-users",
+    link: "/customer"
+  },
+  {
     title: "settings",
     icon: "fas fa-cog",
     link: "/settings"
@@ -152,14 +152,9 @@ export default {
   components: { EssentialLink },
   data() {
     return {
-      drawerRight: false,
+      drawerRight: true,
       essentialLinks: linksData
     };
-  },
-  computed: {
-    auth: () => {
-      return users.getters.ifAuthenticated;
-    }
   }
 };
 </script>

@@ -91,7 +91,10 @@ module.exports = function ( /* ctx */ ) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Cookies',
+        'Notify'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -113,8 +116,8 @@ module.exports = function ( /* ctx */ ) {
         description: `Expense manager`,
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3',
+        background_color: '#f4f4f4',
+        theme_color: '#448aff',
         icons: [{
             src: 'icons/icon-128x128.png',
             sizes: '128x128',
