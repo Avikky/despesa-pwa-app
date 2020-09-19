@@ -31,6 +31,7 @@
               filled
               v-model.trim="loginDetails.email"
               type="email"
+              autocomplete
               label="Email Address"
               class="q-mb-md"
               lazy-rules
@@ -44,6 +45,7 @@
             </q-input>
             <!-- password goes here -->
             <q-input
+              autocomplete
               v-model.trim="loginDetails.password"
               label="Password"
               class="q-mb-md"

@@ -22,3 +22,28 @@ export function checkIfAdmin(state, context) {
     state.auth.authorizeGenAdmin = true;
   }
 }
+
+export function checkError(state, data) {
+  if (data.type == 'expenseCategory') {
+    state.expenses.errorMsg = true;
+  }
+}
+
+export function allExpenses(state, data) {
+  state.expenses.expensesData = data.expenses;
+}
+
+export function allExpensesCategory(state, data) {
+  state.expenses.expenseCategories = data.expense_category
+}
+
+export function openingBalance(state, data) {
+  state.opening_bal.id = data.id;
+  state.opening_bal.amount = data.amount;
+  state.opening_bal.date_created = data.date_created;
+}
+
+export function storeCustomers(state, data) {
+  console.log(data)
+  state.customers.customerArr = data;
+}

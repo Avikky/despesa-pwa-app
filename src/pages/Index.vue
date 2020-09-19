@@ -3,16 +3,18 @@
     <div class="banner">
       <div class="banner-inner">
         <div class="date">
-          <span class="day big-text q-pr-lg">09</span>
-          <span class="month medium-text">July</span>
+          <span class="day big-text q-pr-lg">{{ openingBal.day }}</span>
+          <span class="month medium-text">{{ openingBal.month }}</span>
         </div>
         <div class="balance">
           <span class="naira-sign medium-text" v-html="nairaSign"></span>
-          <span class="amount big-text">{{ openingBal }}</span>
+          <span class="amount big-text">{{
+            formatNumber(openingBal.amount)
+          }}</span>
         </div>
         <div class="crudBtn q-gutter-md">
           <q-btn
-            @click="prompt = true"
+            @click="responseDialog = true"
             round
             color="primary"
             icon="fas fa-plus-circle"
@@ -26,96 +28,243 @@
               prompt = true;
             "
           />
+          <q-btn
+            round
+            color="red"
+            icon="fas fa-trash"
+            @click="deleteResponse = true"
+          />
         </div>
       </div>
       <!-- Dialog for adding and editting Opening Balance -->
       <q-dialog v-model="prompt" persistent>
-        <q-card style="min-width: 350px">
+        <q-card style="min-width: 350px" v-if="!editMode">
           <q-card-section>
             <div class="text-h6">Add Opening Balance</div>
           </q-card-section>
+          <q-form @submit.prevent="createOpeningBal">
+            <q-card-section class="q-pt-none">
+              <q-input
+                dense
+                type="number"
+                v-model="balanceFormData.amount"
+                autofocus
+                placeholder="Amount"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+              <q-input
+                dense
+                placeholder="Date"
+                type="date"
+                v-model="balanceFormData.date_created"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+            </q-card-section>
 
-          <q-card-section class="q-pt-none">
-            <q-input dense v-model="openingBal" autofocus />
+            <q-card-actions align="right" class="text-primary">
+              <q-btn flat label="Add" type="submit" />
+              <q-btn flat label="Cancle" v-close-popup />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+        <!-- if in Edit Mode -->
+        <q-card style="min-width: 350px" v-if="editMode">
+          <q-card-section>
+            <div class="text-h6">Edit Opening Balance</div>
+          </q-card-section>
+          <q-form @submit.prevent="editOpeningBal">
+            <q-card-section class="q-pt-none">
+              <q-input
+                dense
+                placeholder="Amount"
+                type="number"
+                v-model.trim="openingBal.amount"
+                autofocus
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="text-primary">
+              <q-btn flat label="Edit" type="submit" />
+              <q-btn
+                flat
+                label="Cancle"
+                @click="editMode = false"
+                v-close-popup
+              />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+      </q-dialog>
+      <!-- Dialog to display option for balace brought down -->
+      <q-dialog
+        v-model="responseDialog"
+        transition-show="scale"
+        transition-hide="scale"
+      >
+        <q-card class="bg-blue-12 text-white" style="width: 430px">
+          <q-card-section>
+            <div class="text-h6">Before you Proceed</div>
           </q-card-section>
 
-          <q-card-actions align="right" class="text-primary">
+          <q-card-section class="q-pt-none">
+            Would you like to use this Remaining Balance...?
+          </q-card-section>
+
+          <q-card-actions align="right" class="bg-white text-blue-12">
             <q-btn
-              v-if="editMode"
               flat
-              label="Edit"
-              @click="responseDialog = true"
+              label="Yes, use balance"
+              @click="
+                dateReponseModal = true;
+                responseDialog = false;
+              "
             />
             <q-btn
-              v-if="!editMode"
               flat
-              label="Add"
-              @click="responseDialog = true"
+              label="No, Add new balance"
+              @click="
+                prompt = true;
+                responseDialog = false;
+              "
             />
-            <q-btn flat label="Cancle" v-close-popup />
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <!-- Dialop for to display response from first dialog -->
+      <!-- Dialog for deleting Opening balance -->
       <q-dialog
-        v-model="responseDialog"
+        v-model="deleteResponse"
         persistent
         transition-show="scale"
         transition-hide="scale"
       >
-        <q-card class="bg-teal text-white" style="width: 300px">
+        <q-card class="bg-red-12 text-white" style="width: 430px">
           <q-card-section>
-            <div class="text-h6">Persistent</div>
+            <div class="text-h6 text-center">
+              <i class="fas fa-exclamation-triangle"></i> Warning
+            </div>
           </q-card-section>
 
-          <q-card-section class="q-pt-none">
-            Response will be here
+          <q-card-section class="q-pt-none text-center">
+            Are you sure about this..?
           </q-card-section>
 
-          <q-card-actions align="right" class="bg-white text-teal">
-            <q-btn flat label="OK" @click="closeAllModal" />
+          <q-card-actions align="right" class="bg-white text-blue-12">
+            <q-btn flat label="Yes" @click="deleteBal(openingBal.id)" />
+            <q-btn flat label="Cancle" @click="deleteResponse = false" />
           </q-card-actions>
         </q-card>
       </q-dialog>
+      <!-- Date Response Modal Dialog -->
+      <q-dialog
+        v-model="dateReponseModal"
+        persistent
+        transition-show="scale"
+        transition-hide="scale"
+      >
+        <q-card style="width: 430px">
+          <q-card-section>
+            <div class="text-weight-formatDateer">
+              Please Enter the Date to be used for this opening balance
+            </div>
+          </q-card-section>
+          <q-form @submit.prevent="balanceBroughtDown">
+            <q-card-section class="q-pt-none">
+              <q-input
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+                dense
+                type="date"
+                v-model="balanceFormData.date_created"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="bg-white text-blue-12">
+              <q-btn flat label="submit" type="submit" />
+              <q-btn
+                flat
+                label="cancle"
+                @click="
+                  closeAllModal();
+                  dateReponseModal = false;
+                "
+              />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+      </q-dialog>
     </div>
-    <div class="q-my-lg row q-gutter-lg" style="width: 80%; margin: 1rem auto;">
+    <div
+      class="q-my-lg row q-gutter-lg"
+      style="width: 100%; margin: 1rem auto;"
+    >
       <div class="col-md-3">
-        <q-form @submit.prevent="createExpenses">
+        <q-form @submit.prevent="addExpenses">
           <q-card>
             <q-card-section>
               <q-select
+                ref="cate"
+                required
                 outlined
-                v-model="expenses.category"
+                v-model="tempCategory"
+                value=""
                 :options="categories"
+                @input="getId()"
                 label="Expense Category"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
               />
               <br />
               <q-input
+                ref="title"
                 outlined
                 type="text"
-                v-model.trim="expenses.title"
+                v-model.trim="expenseFormData.title"
                 label="Title"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
               />
               <br />
               <q-input
+                ref="desc"
                 outlined
                 type="text"
-                v-model.trim="expenses.description"
+                v-model.trim="expenseFormData.description"
                 label="Description"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
               />
               <br />
               <q-input
+                ref="amt"
                 outlined
                 type="number"
-                v-model.trim="expenses.amount"
+                v-model.trim="expenseFormData.amount"
                 label="Amount"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
               />
               <br />
               <q-input
+                ref="by"
                 outlined
                 type="text"
-                v-model.trim="expenses.made_by"
+                v-model.trim="expenseFormData.made_by"
                 label="Made By"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
               />
               <br />
               <q-btn
@@ -147,37 +296,56 @@
                 </div>
               </div>
               <div class="table-data">
-                <div class="data-header row">
-                  <p class="col-md-4 text-bold">Expenses</p>
-                  <p class="col-md-4 text-bold">
-                    (<span v-html="nairaSign" class="q-pr-sm"></span>) Amount
-                  </p>
-                  <p class="col-md-4 text-bold">Action</p>
-                </div>
                 <q-separator class="q-my-sm" />
                 <!-- your main table data starts here -->
                 <div class="main-data">
-                  <template>
-                    <div class="row">
-                      <p class="col-md-4">Transport to Nsukka</p>
-                      <p class="col-md-4">1000</p>
-                      <p class="col-md-4 q-gutter-sm">
-                        <q-btn
-                          size="10px"
-                          label="edit"
-                          type="submit"
-                          class="bg-primary text-white"
-                        />
-                        <q-btn
-                          size="10px"
-                          label="delete"
-                          type="submit"
-                          class="bg-red-10 text-white"
-                        />
-                      </p>
-                    </div>
-                    <q-separator class="q-my-sm" />
-                  </template>
+                  <q-markup-table>
+                    <thead>
+                      <tr>
+                        <th class="text-left text-weight-formatDateer">
+                          Title
+                        </th>
+                        <th class="text-right text-weight-formatDateer">
+                          Amount
+                        </th>
+                        <th class="text-center text-weight-formatDateer">
+                          Description
+                        </th>
+                        <th class="text-center text-weight-formatDate">
+                          Made by
+                        </th>
+                        <th class="text-center text-weight-formatDate">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="expense in expenses" :key="expense.id">
+                        <td class="text-left">{{ expense.title }}</td>
+
+                        <td class="text-right">&#8358; {{ expense.amount }}</td>
+                        <td class="text-center">{{ expense.description }}</td>
+                        <td class="text-center">{{ expense.made_by }}</td>
+                        <td class="text-right">
+                          <span class="col-md-4 q-gutter-sm">
+                            <!-- <q-btn
+                              size="10px"
+                              label="edit"
+                              type="submit"
+                              class="bg-primary text-white"
+                            /> -->
+                            <q-btn
+                              @click="trigerDelete(expense.id, expense.amount)"
+                              size="10px"
+                              label="delete"
+                              type="submit"
+                              class="bg-red-10 text-white"
+                            />
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </q-markup-table>
                 </div>
               </div>
             </div>
@@ -189,38 +357,437 @@
 </template>
 
 <script>
+import * as store from "../store/users";
+import axios from "axios";
+import { Cookies } from "quasar";
+import { date } from "quasar";
+import { openingBalance } from "../store/users/mutations";
+import { Notify } from "quasar";
 export default {
   name: "home",
   data() {
     return {
+      baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
+      dateReponseModal: false,
+      deleteResponse: false,
       editMode: false,
       searchExpense: "",
       responseDialog: false,
       prompt: false,
-      date: {
+      reduceBal: "",
+      expenses: [],
+      openingBal: {
+        id: "",
+        amount: "000000",
         day: "",
-        month: ""
+        month: "",
+        date: ""
       },
-      openingBal: "100,000",
-      categories: ["Fuel", "Transport", "Photocopy"],
-      expenses: {
-        category: "",
+      categories: [],
+      rawCategory: "",
+      tempCategory: "",
+      expenseFormData: {
+        category_id: "",
         title: "",
         description: "",
         amount: "",
         made_by: ""
+      },
+      balanceFormData: {
+        amount: "",
+        date_created: ""
       }
     };
   },
   methods: {
+    formatNumber(num) {
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    },
+    resetForm() {
+      this.$refs.cate.resetValidation();
+      this.$refs.by.resetValidation();
+      this.$refs.amt.resetValidation();
+      this.$refs.title.resetValidation();
+      this.$refs.desc.resetValidation();
+    },
+    deleteBal(id) {
+      console.log("delte btn triggered");
+      axios
+        .delete(this.baseUrl + "opening-balance/delete/" + id, {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          //console.log(res.data);
+          if (res.data.error) {
+            this.$q.notify({
+              message: res.data.error,
+              position: "top",
+              type: "negative"
+            });
+          }
+          if (res.data.success) {
+            this.$q.notify({
+              message: res.data.success,
+              position: "top",
+              type: "positive"
+            });
+            this.loadOpeningBal();
+            this.deleteResponse = false;
+          }
+        })
+        .catch(err => {
+          this.$q.notify({
+            message: "opps something went wrong",
+            position: "top",
+            type: "negative"
+          });
+        });
+    },
+    debitBal(id) {
+      let newBalance = this.openingBal.amount - this.reduceBal;
+      this.openingBal.amount = newBalance;
+
+      axios
+        .put(
+          this.baseUrl + "opening-balance/reuse-bal/" + id,
+          { amount: newBalance },
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: "bearer" + Cookies.get("jwt_token")
+            }
+          }
+        )
+        .then(res => {})
+        .catch(err => {
+          console.log(err.status);
+        });
+    },
+    balanceBroughtDown() {
+      this.balanceFormData.amount = this.openingBal.amount;
+      this.balanceFormData.date_created;
+
+      axios
+        .post(this.baseUrl + "opening-balance/add", this.balanceFormData, {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          console.log(res.data.status);
+          if (res.data.errors) {
+            this.$q.notify({
+              message: "This Date Already Exist",
+              position: "top",
+              type: "negative"
+            });
+          }
+          if (res.data.status == "success") {
+            this.balanceFormData.amount = null;
+            this.balanceFormData.date_created = null;
+            this.$q.notify({
+              message: "Opening Balance Added Successfully",
+              position: "top",
+              type: "positive"
+            });
+            this.loadOpeningBal();
+            this.dateReponseModal = false;
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$q.notify({
+            message: "Opps Something went wrong",
+            position: "top",
+            type: "negative"
+          });
+        });
+    },
+    loadOpeningBal() {
+      axios
+        .get(this.baseUrl + "opening-balance/last", {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          let balDate = new Date(res.data.date_created);
+          console.log(balDate.getDate());
+          let day;
+          if (balDate.getDate() <= 9) {
+            day = "0" + balDate.getDate();
+          } else {
+            day = balDate.getDate();
+          }
+          this.openingBal.id = res.data.id;
+          this.openingBal.amount = res.data.amount;
+          this.openingBal.day = day;
+          this.openingBal.month = date.formatDate(balDate, "MMM");
+          this.openingBal.date = res.data.date_created;
+          //console.log(this.openingBal);
+        })
+        .catch(err => {
+          console.log(err.status);
+        });
+    },
+    createOpeningBal() {
+      console.log("create balance");
+      axios
+        .post(this.baseUrl + "opening-balance/add", this.balanceFormData, {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          if (res.data.errors) {
+            this.$q.notify({
+              message: "This Date Already Exist",
+              position: "top",
+              type: "negative"
+            });
+          }
+          if (res.data.status == "success") {
+            this.balanceFormData.amount = null;
+            this.balanceFormData.date_created = null;
+            this.$q.notify({
+              message: "Opening Balance Added Successfully",
+              position: "top",
+              type: "positive"
+            });
+            this.loadOpeningBal();
+            this.closeAllModal();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$q.notify({
+            message: "Opps Something went wrong",
+            position: "top",
+            type: "negative"
+          });
+        });
+    },
+    editOpeningBal() {
+      console.log("edit balance");
+      axios
+        .put(
+          this.baseUrl + "opening-balance/edit/" + this.openingBal.id,
+          {
+            amount: this.openingBal.amount
+          },
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: "bearer" + Cookies.get("jwt_token")
+            }
+          }
+        )
+        .then(res => {
+          console.log(res);
+          if (res.data.status == "success") {
+            this.$q.notify({
+              message: "Editted Successfully",
+              position: "top",
+              type: "positive"
+            });
+            this.closeAllModal();
+          } else {
+            this.$q.notify({
+              message: "Opps Something went wrong",
+              position: "top",
+              type: "negative"
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.status);
+        });
+    },
+    getId() {
+      if (this.tempCategory) {
+        console.log(this.tempCategory);
+        /*     this is the data parameter used for the search */
+        let cateVal = this.tempCategory;
+        /* end */
+
+        /* this is the array to be searched through */
+        let cateArr = this.$store.getters.expenseCategory.data;
+        /* end */
+        /*         important function used to search through an array in js */
+        let cateId = cateArr.find(function(category, index) {
+          if (category.name == cateVal) {
+            return true;
+          }
+        });
+        /* end */
+        /* Result of the search */
+        /* console.log(cateId.id); */
+        this.expenseFormData.category_id = cateId.id;
+      } else {
+        console.log("data not set");
+      }
+    },
     closeAllModal() {
       this.prompt = false;
       this.responseDialog = false;
+    },
+    addExpenses() {
+      this.expenseFormData.date_of_expense = this.openingBal.date;
+      this.expenseFormData.opening_bal_id = this.openingBal.id;
+      let balId = this.openingBal.id;
+      console.log(this.expenseFormData);
+      axios
+        .post(this.baseUrl + "expenses/store", this.expenseFormData, {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(() => {
+          this.reduceBal = this.expenseFormData.amount;
+          console.log("Expense Added Successfully.");
+          this.tempCategory = null;
+          this.expenseFormData.category_id = null;
+          this.expenseFormData.title = null;
+          this.expenseFormData.description = null;
+          this.expenseFormData.amount = null;
+          this.expenseFormData.made_by = null;
+          this.expenseFormData.date_of_expense = null;
+          this.expenseFormData.opening_bal_id = null;
+          this.resetForm();
+          this.fetchExpenses();
+          this.$q.notify({
+            message: "Expense Added Successfully",
+            position: "bottom-left",
+            type: "positive"
+          });
+
+          this.debitBal(balId);
+        })
+
+        .catch(err => {
+          console.log(err);
+          this.$q.notify({
+            message: "Opps Something went wrong",
+            position: "bottom-left",
+            type: "negative"
+          });
+        });
+    },
+    fetchExpenses() {
+      axios
+        .get(this.baseUrl + "expenses/all", {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          //console.log(res)
+          if (res.data) {
+            this.$store.commit("allExpenses", {
+              expenses: res.data
+            });
+            this.expenses = res.data.data;
+            console.log(this.expenses);
+          }
+        })
+        .catch(err => {
+          console.log(err.status);
+        });
+    },
+    fetchExpensesCategory() {
+      axios
+        .get(this.baseUrl + "expense-category/all", {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          }
+        })
+        .then(res => {
+          if (res.data.status == 401) {
+            this.$store.commit("checkError", {
+              type: "expenseCategory"
+            });
+          } else {
+            this.$store.commit("allExpensesCategory", {
+              expense_category: res.data
+            });
+            this.getCategories();
+            //console.log(res.data)
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    async getCategories() {
+      await this.$store.getters.expenseCategory.data;
+      let rawCategory = this.$store.getters.expenseCategory.data;
+      let categoriesByName = rawCategory.map(item => {
+        let name = item.name;
+        return name;
+      });
+      this.categories = categoriesByName;
+    },
+    trigerDelete(expenseId, expenseAmt) {
+      axios
+        .delete(this.baseUrl + "expenses/delete/" + expenseId, {
+          headers: {
+            Accept: "application/json",
+            Authorization: "bearer" + Cookies.get("jwt_token")
+          },
+          data: {
+            balId: this.openingBal.id,
+            amount: expenseAmt
+          }
+        })
+        .then(res => {
+          console.log(res.data.success);
+          if (res.data.success) {
+            this.loadOpeningBal();
+            this.fetchExpenses();
+            this.$q.notify({
+              message: "Expense Deleted Successfully",
+              position: "top",
+              type: "positive"
+            });
+          } else {
+            this.$q.notify({
+              message: "Opps Something went wrong",
+              position: "top",
+              type: "negative"
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          this.$q.notify({
+            message: "Opps Something went wrong",
+            position: "top",
+            type: "negative"
+          });
+        });
     }
   },
+  created() {
+    this.fetchExpenses();
+    this.fetchExpensesCategory();
+    this.formatNumber();
+  },
+
   mounted() {
     this.closeAllModal();
+    this.getId();
+    this.loadOpeningBal();
   }
 };
 </script>

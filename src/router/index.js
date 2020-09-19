@@ -37,6 +37,10 @@ export default function ( /* { store, ssrContext } */ ) {
 
   Router.beforeEach((to, from, next) => {
     var isAuthed = !!Cookies.get('jwt_token');
+    var AuthExpire = Cookies.get('token_expireAt');
+    let currentTime = new Date().getTime();
+
+
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (!isAuthed) {
         return next({
@@ -46,7 +50,14 @@ export default function ( /* { store, ssrContext } */ ) {
           }
         });
       }
-
+      // if (currentTime > AuthExpire) {
+      //   return next({
+      //     path: "/login",
+      //     params: {
+      //       nextUrl: to.fullPath
+      //     }
+      //   });
+      // }
     }
     next();
   });

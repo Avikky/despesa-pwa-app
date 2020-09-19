@@ -15,7 +15,7 @@ Vue.use(Vuex)
  */
 
 export default function ( /* { ssrContext } */ ) {
-  const store = new Vuex.Store({
+  const Store = new Vuex.Store({
     modules: {
       user,
     },
@@ -25,5 +25,5 @@ export default function ( /* { ssrContext } */ ) {
     strict: process.env.DEV
   })
 
-  return store
+  return Store
 }

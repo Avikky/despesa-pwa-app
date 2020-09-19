@@ -25,6 +25,11 @@
             to="/expenses"
           ></q-route-tab>
           <q-route-tab name="income" label="Income" to="/income"></q-route-tab>
+          <q-route-tab
+            name="customer"
+            label="Customers"
+            to="/customer"
+          ></q-route-tab>
           <q-route-tab name="report" label="Report" to="/report"></q-route-tab>
           <q-route-tab
             name="settings"
@@ -128,6 +133,11 @@ const linksData = [
     title: "Income",
     icon: "fas fa-cubes",
     link: "/income"
+  },
+  {
+    title: "Customers",
+    icon: "fas fa-cubes",
+    link: "/customer"
   },
   {
     title: "Report",
