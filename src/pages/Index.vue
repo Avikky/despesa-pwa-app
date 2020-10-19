@@ -299,7 +299,7 @@
                 <q-separator class="q-my-sm" />
                 <!-- your main table data starts here -->
                 <div class="main-data">
-                  <q-markup-table>
+                  <q-markup-table v-if="expenses.length">
                     <thead>
                       <tr>
                         <th class="text-left text-weight-formatDateer">
@@ -346,6 +346,11 @@
                       </tr>
                     </tbody>
                   </q-markup-table>
+                  <div v-else class="q-pa-md bg-info">
+                    <p class="text-center q-mt-md text-h6">
+                      No Expenses recorded for today
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -392,7 +397,7 @@ export default {
         title: "",
         description: "",
         amount: "",
-        made_by: ""
+        made_by: "",
       },
       balanceFormData: {
         amount: "",
@@ -412,7 +417,7 @@ export default {
       this.$refs.desc.resetValidation();
     },
     deleteBal(id) {
-      console.log("delte btn triggered");
+      console.log("delete btn triggered");
       axios
         .delete(this.baseUrl + "opening-balance/delete/" + id, {
           headers: {
@@ -437,6 +442,7 @@ export default {
             });
             this.loadOpeningBal();
             this.deleteResponse = false;
+            this.fetchExpenses();
           }
         })
         .catch(err => {
@@ -496,6 +502,7 @@ export default {
               type: "positive"
             });
             this.loadOpeningBal();
+            this.fetchExpenses();
             this.dateReponseModal = false;
           }
         })
@@ -598,6 +605,7 @@ export default {
               position: "top",
               type: "positive"
             });
+            this.loadOpeningBal();
             this.closeAllModal();
           } else {
             this.$q.notify({

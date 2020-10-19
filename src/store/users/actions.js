@@ -51,7 +51,9 @@ export function login({
       if (res.data) {
         commit('authenticateUser', {
           username: res.data.username,
-          email: res.data.email
+          email: res.data.email,
+          role: res.data.role,
+          gender: res.data.gender
         });
       }
       if (res.data.user_role == 3) {

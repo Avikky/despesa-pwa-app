@@ -36,11 +36,6 @@
             label="Settings"
             to="/settings"
           ></q-route-tab>
-          <q-route-tab
-            name="file-manager"
-            label="file-manager"
-            to="/file-manager"
-          ></q-route-tab>
         </q-tabs>
         <q-space />
         <q-btn
@@ -50,9 +45,10 @@
           glossy
           icon="fas fa-user-circle"
           label="Logout"
+          @click="logout"
           to="#"
         />
-        <div class="gt-sm text-black"><small>Expense tracking app</small></div>
+        
         <q-btn
           id="menu-icon"
           class="lt-md shadow-2 q-mr-lg"
@@ -125,6 +121,11 @@ import EssentialLink from "components/EssentialLink.vue";
 
 const linksData = [
   {
+    title: "Dashboard",
+    icon: "fas fa-chart-th",
+    link: "/home"
+  },
+  {
     title: "Expenses",
     icon: "fas fa-chart-line",
     link: "/expenses"
@@ -149,12 +150,12 @@ const linksData = [
     icon: "fas fa-cog",
     link: "/settings"
   },
-  {
-    title: "File Manager",
-    caption: "Comming Soon",
-    icon: "fas fa-file",
-    link: "/file-manager"
-  }
+  // {
+  //   title: "File Manager",
+  //   caption: "Comming Soon",
+  //   icon: "fas fa-file",
+  //   link: "/file-manager"
+  // }
 ];
 
 export default {
@@ -169,6 +170,11 @@ export default {
   computed: {
     auth: () => {
       return users.getters.ifAuthenticated;
+    }
+  },
+  methods: {
+    logout(){
+      console.log('logout btn clicked')
     }
   }
 };

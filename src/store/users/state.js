@@ -1,5 +1,7 @@
 export default function () {
+
   return {
+
     auth: {
       authorizeUser: false,
       authorizeGenAdmin: false,
@@ -7,24 +9,35 @@ export default function () {
       loadingBtn: true,
       username: null,
       email: null,
+      role: null,
+      gender: null,
     },
+
     expenses: {
       expenseCategories: null,
       expensesData: null,
       errorMsg: false
     },
-    income: {
-      incomeData: "",
-      Customers: "",
-      errorMsg: false
-    },
+
+    // income: {
+    //   incomeData: "",
+    //   Customers: "",
+    //   errorMsg: false
+    // },
+
     opening_bal: {
       id: null,
       amount: null,
       date_created: null,
     },
+
     customers: {
       customerArr: "",
+    },
+
+    income: {
+      data: ""
     }
+
   }
 }

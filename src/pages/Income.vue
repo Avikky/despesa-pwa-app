@@ -5,13 +5,14 @@
       style="width: 100%; margin: 1rem auto;"
     >
       <div class="col-md-3">
-        <q-form @submit.prevent="addIncome">
+        <q-form @submit.prevent="modeCheck">
           <q-card>
             <q-card-section>
               <q-select
+                v-if="editSource == false"
                 required
                 outlined
-                value=""
+                v-model="tempSource"
                 :options="incomeSource"
                 @input="getIncomeSourceType()"
                 label="Income Source"
@@ -20,30 +21,42 @@
                 ]"
               />
 
-              <q-select
-                v-if="sourceSelected != null"
-                required
+              <q-input
+                v-if="editSource"
                 outlined
-                v-model="tempSource"
-                value=""
-                :options="customers"
-                @input="getId()"
-                label="Customers"
+                type="text"
+                v-model.trim="incomeFormData.source"
+                label="Income Source"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
 
-              <q-input
-                v-if="sourceSelected != null"
+              <q-select
+                v-if="tempSource == 'Customers'"
+                transition-show="fade"
+                transition-hide="fade"
+                required
                 outlined
-                type="text"
-                v-model.trim="incomeFormData.source"
-                label="Please Specify income source"
+                v-model="incomeFormData.source"
+                :options="customers"
+                @input="getIncomeSourceType()"
+                label="Select customers"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
+              <q-input
+                v-if="tempSource == 'Non Customers'"
+                outlined
+                type="text"
+                v-model.trim="incomeFormData.source"
+                label="Please Specify Customer Name"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+              
 
               <q-input
                 outlined
@@ -64,13 +77,39 @@
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
+                <q-select
+                required
+                outlined
+                v-model="tempVat"
+                :options="vat"
+                @input="getVatType()"
+                label="Value Added Tax (VAT)"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+
+              <q-input
+                transition-show="fade"
+                transition-hide="fade"
+                v-if="tempVat == 'Yes'"
+                outlined
+                type="number"
+                min="0" max="99" step="any"
+                v-on:blur="calTotal"
+                v-model.trim="incomeFormData.vat"
+                label="Please specify Vat percentage"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+
               <q-select
                 required
                 outlined
                 v-model="incomeFormData.mop"
                 value=""
                 :options="mop"
-                @input="getId()"
                 label="Method of payment"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
@@ -80,15 +119,22 @@
                 type="date"
                 required
                 outlined
-                v-model="incomeFormData.date_of_payment"
+                v-model="incomeFormData.date_received"
                 label="Date Recieved"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
               <br />
-              <q-btn
+                <q-btn
+                v-if="editSource == false"
                 label="Add Income"
+                type="submit"
+                class="full-width bg-primary text-white"
+              />
+              <q-btn
+                v-else
+                label="Update Income"
                 type="submit"
                 class="full-width bg-primary text-white"
               />
@@ -131,6 +177,9 @@
                         <th class="text-center text-weight-bolder">
                           Amount
                         </th>
+                         <th class="text-center text-weight-bolder">
+                          VAT (%)
+                        </th>
                         <th class="text-center text-weight-bold">
                           Method of payment
                         </th>
@@ -142,16 +191,16 @@
                     </thead>
                     <tbody>
                       <tr v-for="item in income" :key="item.id">
-                        <td class="text-left">customer name/source</td>
-                        <td class="text-center">little description</td>
-                        <td class="text-right">&#8358; 2344</td>
-
-                        <td class="text-center">by cash</td>
-                        <td class="text-center">date received</td>
+                        <td class="text-left">{{item.source}}</td>
+                        <td class="text-center">{{item.description}}</td>
+                        <td class="text-right">&#8358; {{item.amount}}</td>
+                        <td class="text-center">{{item.vat_percentage}}</td>
+                         <td class="text-center">{{item.mop}}</td>
+                        <td class="text-center">{{item.date_received}}</td>
                         <td class="text-right">
                           <span class="col-md-4 q-gutter-sm">
                             <q-btn
-                              @click="trigerEdit()"
+                              @click="trigerEdit(item.id); editMode = true;"
                               size="10px"
                               label="Edit"
                               class="bg-primary text-white"
@@ -190,17 +239,20 @@ export default {
       baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
       editMode: false,
+      editSource: false,
       searchIncome: "",
       incomeSource: ["Customers", "Non Customers"],
       mop: ["Cash", "Bank Transfer", "Cheque"],
-      sourceSelected: null,
-      income: [],
+      vat: ['Yes', 'No'],
+      sourceSelected: false,
+      income: "",
       customers: [],
       tempSource: "",
+      tempVat: "",
+      singleIncome: "",
       incomeFormData: {
         source: "",
-        type: "",
-        customer_id: "",
+        vat_percentage: "",
         description: "",
         amount: "",
         date_received: "",
@@ -212,80 +264,46 @@ export default {
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
-    deleteBal(id) {
-      console.log("delte btn triggered");
-      axios
-        .delete(this.baseUrl + "opening-balance/delete/" + id, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
-        .then(res => {
-          //console.log(res.data);
-          if (res.data.error) {
-            this.$q.notify({
-              message: res.data.error,
-              position: "top",
-              type: "negative"
-            });
-          }
-          if (res.data.success) {
-            this.$q.notify({
-              message: res.data.success,
-              position: "top",
-              type: "positive"
-            });
-            this.loadOpeningBal();
-            this.deleteResponse = false;
-          }
-        })
-        .catch(err => {
-          this.$q.notify({
-            message: "opps something went wrong",
-            position: "top",
-            type: "negative"
-          });
+
+    getIncomeSourceType(){
+      let rawCustomers = this.$store.getters.customers;
+      if(this.tempSource == 'Customers') {
+        let customerNames =  
+        rawCustomers.map(item => {
+          let name = item.name;
+          return name;
         });
+        console.log(customerNames);
+        this.customers = customerNames;
+      }
+    },
+    getVatType(){
+      if(this.tempVat == 'No'){
+        this.incomeFormData.vat_percentage = 'Nill';
+      }
     },
 
-    createOpeningBal() {
-      console.log("create balance");
+    calTotal(){
+      let vatDecimal = this.incomeFormData.vat / 100;
+      let percentageVal = vatDecimal * this.incomeFormData.amount;
+      let amnt = this.incomeFormData.amount - percentageVal;
+      console.log(amnt);
+    },
+
+    loadCustomers() {
       axios
-        .post(this.baseUrl + "opening-balance/add", this.balanceFormData, {
+        .get(this.baseUrl + "customer/all", {
           headers: {
             Accept: "application/json",
             Authorization: "bearer" + Cookies.get("jwt_token")
           }
         })
-        .then(res => {
-          console.log(res.data);
-          if (res.data.errors) {
-            this.$q.notify({
-              message: "This Date Already Exist",
-              position: "top",
-              type: "negative"
-            });
-          }
-          if (res.data.status == "success") {
-            this.balanceFormData.amount = null;
-            this.balanceFormData.date_created = null;
-            this.$q.notify({
-              message: "Opening Balance Added Successfully",
-              position: "top",
-              type: "positive"
-            });
-            this.loadOpeningBal();
-            this.closeAllModal();
-          }
+        .then( res => {
+          console.log(res.data.data);
+          this.$store.commit("storeCustomers", res.data.data);
         })
         .catch(err => {
           console.log(err);
-          this.$q.notify({
-            message: "Opps Something went wrong",
-            position: "top",
-            type: "negative"
-          });
         });
     },
 
@@ -317,48 +335,17 @@ export default {
       this.prompt = false;
       this.responseDialog = false;
     },
-    addExpenses() {
-      this.incomeFormData.date_of_expense = this.openingBal.date;
-      this.incomeFormData.opening_bal_id = this.openingBal.id;
-      let balId = this.openingBal.id;
-      console.log(this.incomeFormData);
-      axios
-        .post(this.baseUrl + "income/store", this.incomeFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
-        .then(() => {
-          this.reduceBal = this.incomeFormData.amount;
-          console.log("Expense Added Successfully.");
-          this.tempSource = null;
-          this.incomeFormData.category_id = null;
-          this.incomeFormData.title = null;
-          this.incomeFormData.description = null;
-          this.incomeFormData.amount = null;
-          this.incomeFormData.made_by = null;
-          this.incomeFormData.date_of_expense = null;
-          this.incomeFormData.opening_bal_id = null;
-          this.fetchExpenses();
-          this.$q.notify({
-            message: "Expense Added Successfully",
-            position: "bottom-left",
-            type: "positive"
-          });
-          this.debitBal(balId);
-        })
+    loadIncomeFromStore(id){
+      let incomeArr = this.$store.getters.income;
+      let oneIncome = incomeArr.find(function(params, index) {
+        if (params.id == id) {
+          return true;
+        }
+      });
 
-        .catch(err => {
-          console.log(err);
-          this.$q.notify({
-            message: "Opps Something went wrong",
-            position: "bottom-left",
-            type: "negative"
-          });
-        });
+      this.singleIncome = oneIncome;
     },
-    fetchExpenses() {
+    loadIncome(){
       axios
         .get(this.baseUrl + "income/all", {
           headers: {
@@ -366,97 +353,148 @@ export default {
             Authorization: "bearer" + Cookies.get("jwt_token")
           }
         })
-        .then(res => {
-          //console.log(res)
-          if (res.data) {
-            this.$store.commit("allExpenses", {
-              income: res.data
-            });
+        .then( res => {
+          if(res.status == 200){
+            console.log(res.data.data);
+            this.$store.commit("storeIncome", res.data.data);
             this.income = res.data.data;
             console.log(this.income);
           }
         })
         .catch(err => {
-          console.log(err.status);
-        });
-    },
-    fetchExpensesCategory() {
-      axios
-        .get(this.baseUrl + "expense-category/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
-        .then(res => {
-          if (res.data.status == 401) {
-            this.$store.commit("checkError", {
-              type: "expenseCategory"
-            });
-          } else {
-            this.$store.commit("allExpensesCategory", {
-              expense_category: res.data
-            });
-            this.getCategories();
-            //console.log(res.data)
-          }
-        })
-        .catch(err => {
           console.log(err);
         });
     },
-    async getCategories() {
-      await this.$store.getters.expenseCategory.data;
-      let rawCategory = this.$store.getters.expenseCategory.data;
-      let customersByName = rawCategory.map(item => {
-        let name = item.name;
-        return name;
-      });
-      this.customers = customersByName;
-    },
-    trigerDelete(expenseId, expenseAmt) {
-      axios
-        .delete(this.baseUrl + "income/delete/" + expenseId, {
+
+    addIncome(){
+      console.log('hello from addIncome')
+       axios
+        .post(this.baseUrl + "income/store", this.incomeFormData, {
           headers: {
             Accept: "application/json",
             Authorization: "bearer" + Cookies.get("jwt_token")
-          },
-          data: {
-            balId: this.openingBal.id,
-            amount: expenseAmt
           }
         })
         .then(res => {
-          console.log(res.data.success);
-          if (res.data.success) {
-            this.loadOpeningBal();
-            this.fetchExpenses();
+          console.log(res)
+          if (res.error) {
             this.$q.notify({
-              message: "Expense Deleted Successfully",
-              position: "top",
-              type: "positive"
-            });
-          } else {
-            this.$q.notify({
-              message: "Opps Something went wrong",
+              message: "Opps something went wrong",
               position: "top",
               type: "negative"
             });
+            
+          }
+          if (res.status == 200) {
+            (this.incomeFormData.source = null),
+              (this.incomeFormData.vat = null),
+              (this.tempVat = null),
+              (this.tempSource = null),
+              (this.incomeFormData.description = null),
+              (this.incomeFormData.date_received = null),
+              (this.incomeFormData.mop = null),
+              (this.incomeFormData.amount = null),
+              this.$q.notify({
+                message: "Income Added Successfullyy",
+                position: "top",
+                type: "positive"
+              });
+            this.loadIncome();
+            
           }
         })
-        .catch(err => {
-          console.log(err);
+        .catch(res => {
           this.$q.notify({
-            message: "Opps Something went wrong",
+            message: "Opps something went wrong",
             position: "top",
             type: "negative"
           });
         });
-    }
+    },
+
+    modeCheck() {
+      if (this.editMode) {
+        this.updateIncome();
+      }
+      if (!this.editMode) {
+        this.addIncome();
+      }
+    },
+
+    updateIncome(){  
+      axios
+        .put(
+          this.baseUrl + "income/update/" + this.singleIncome.id,
+          this.incomeFormData,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: "bearer" + Cookies.get("jwt_token")
+            }
+          }
+        )
+        .then(res => {
+          if (res.errors) {
+            this.$q.notify({
+              message: "Opps something went wrong",
+              position: "top",
+              type: "negative"
+            });
+          }
+          if (res.data.status.success) {
+            this.loadIncome();
+            this.$q.notify({
+              message: "Income Edited Successfullyy",
+              position: "top",
+              type: "positive"
+            });
+              this.editMode = false;
+              (this.incomeFormData.source = null);
+              (this.incomeFormData.vat = null);
+              (this.tempVat = null);
+              (this.tempSource = null);
+              (this.incomeFormData.description = null);
+              (this.incomeFormData.date_received = null);
+              (this.incomeFormData.mop = null);
+              (this.incomeFormData.amount = null);
+
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+
+    trigerEdit(id){
+      this.loadIncomeFromStore(id)
+      this.editSource = true;
+      this.editMode = true;
+      this.incomeFormData.source  = this.singleIncome.source;
+      this.incomeFormData.description  = this.singleIncome.description;
+      this.incomeFormData.amount  = this.singleIncome.amount;
+      this.incomeFormData.date_received  = this.singleIncome.date_received;
+      this.incomeFormData.mop  = this.singleIncome.mop;
+      if(this.singleIncome.vat_percentage == 'Nill' ){
+        this.tempVat  = 'No';
+      }else{
+        this.tempVat  = 'Yes';
+        this.incomeFormData.vat_percentage = this.singleIncome.vat_percentage
+      }
+      
+      this.updateIncome(id);
+
+      console.log('hello from edit')
+
+    },
+
   },
+
   created() {
-    this.formatNumber();
+    //this.formatNumber();
+    this.loadCustomers();
+    this.loadIncome();
   },
+ 
 
   mounted() {}
 };

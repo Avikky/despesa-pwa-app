@@ -114,6 +114,11 @@
 import EssentialLink from "components/EssentialLink.vue";
 
 const linksData = [
+    {
+    title: "Dashboard",
+    icon: "fas fa-chart-th",
+    link: "/home"
+  },
   {
     title: "Expenses",
     icon: "fas fa-chart-line",
@@ -139,12 +144,7 @@ const linksData = [
     icon: "fas fa-cog",
     link: "/settings"
   },
-  {
-    title: "File Manager",
-    caption: "Comming Soon",
-    icon: "fas fa-file",
-    link: "/file-manager"
-  }
+
 ];
 
 export default {

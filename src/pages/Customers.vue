@@ -432,16 +432,19 @@ export default {
         this.customerType = false;
         this.customersFormData.category = this.tempCate;
       } else {
+
         this.tempCate = "others";
         this.customerType = true;
         this.specifyType = this.singleCustomer.category;
         this.customersFormData.category = this.specifyType;
       }
+
       this.customersFormData.name = this.singleCustomer.name;
 
       this.customersFormData.service_provided = this.singleCustomer.service_provided;
       this.customersFormData.payment_interval = this.singleCustomer.payment_interval;
       this.customersFormData.current_billing_date = this.singleCustomer.current_billing_date;
+
       this.editMode = true;
     },
     updateCustomer() {
@@ -495,13 +498,15 @@ export default {
           }
         })
         .then(res => {
-          console.log(res);
+          //console.log(res);
           if (res.data.success) {
+            this.loadCustomers()
             this.$q.notify({
               message: "Record deleted successfully",
               position: "top",
               type: "positive"
             });
+            
           }
         })
         .catch(err => {

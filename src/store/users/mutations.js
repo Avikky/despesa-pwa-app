@@ -44,6 +44,10 @@ export function openingBalance(state, data) {
 }
 
 export function storeCustomers(state, data) {
-  console.log(data)
   state.customers.customerArr = data;
+}
+
+export function storeIncome(state, data) {
+  console.log(data)
+  state.income.data = data;
 }

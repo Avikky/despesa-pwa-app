@@ -27,6 +27,11 @@ export function expenseCategory(state) {
 }
 
 export function customers(state) {
-	console.log(state.customers);
+	//console.log(state.customers);
 	return state.customers.customerArr;
+}
+
+export function income(state) {
+	//console.log(state.income.data);
+	return state.income.data;
 }
