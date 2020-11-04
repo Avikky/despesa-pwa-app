@@ -1,10 +1,7 @@
 import axios from 'axios';
-import {
-  Cookies
-} from 'quasar';
-import {
-  Notify
-} from 'quasar'
+import { Cookies } from 'quasar';
+import { Notify } from 'quasar';
+
 const baseUrl = 'http://127.0.0.1:8000/api/';
 export function register({
   commit
@@ -26,11 +23,9 @@ export function register({
       console.log(error);
     });
 }
-export function login({
-  commit
-}, userData) {
+export function login({ commit }, userData) {
   axios
-    .post(baseUrl + 'auth/login', userData, {
+    .post('auth/login', userData, {
       headers: {
         Accept: 'application/json',
         Authorization: 'bearer'
@@ -50,8 +45,11 @@ export function login({
       Cookies.set('token_expireAt', expiringTime);
       if (res.data) {
         commit('authenticateUser', {
+          isLogin: true,
+          id: res.data.id,
           username: res.data.username,
           email: res.data.email,
+          phone: res.data.phone,
           role: res.data.role,
           gender: res.data.gender
         });
@@ -93,9 +91,35 @@ export function login({
     });
 }
 
-export function logout({
-  commit
-}, userData) {}
+
+export function logout({commit}, userData) {
+   axios
+     .post(baseUrl + "auth/logout", {userData}, {
+       headers: {
+         Accept: "application/json",
+         Authorization: "bearer" + Cookies.get("jwt_token")
+       }
+     })
+     .then(res => {
+       console.log(res)
+       if (res.status == 200) {
+        commit('logout');
+         Cookies.remove('jwt_token')
+         Cookies.remove('token_expireAt')
+         this.$router.push('/login');
+       } else {
+         this.$q.notify({
+           message: "opps something went wrong",
+           position: "top",
+           type: "negative"
+         });
+       }
+     })
+     .catch(err => {
+       console.log(err);
+     });
+
+}
 
 export function fetchExpenses({
   commit

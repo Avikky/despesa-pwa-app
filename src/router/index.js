@@ -20,7 +20,8 @@ Vue.use(VueRouter)
  * with the Router instance.
  */
 
-export default function ( /* { store, ssrContext } */ ) {
+export default function ( /* { store, ssrContext } */) {
+  
   const Router = new VueRouter({
     scrollBehavior: () => ({
       x: 0,
@@ -50,7 +51,7 @@ export default function ( /* { store, ssrContext } */ ) {
           }
         });
       }
-      
+
       // if (currentTime > AuthExpire) {
       //   return next({
       //     path: "/login",

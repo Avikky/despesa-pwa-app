@@ -1,4 +1,5 @@
-const routes = [{
+const routes = [
+  {
     path: '/',
     redirect: '/login',
     component: () => import('layouts/NoLayout.vue'),
@@ -42,6 +43,10 @@ const routes = [{
       {
         path: '/report',
         component: () => import('pages/Report.vue')
+      },
+      {
+        path: '/add-expense',
+        component: () => import('components/AddExpense.vue')
       },
       {
         path: '/settings',

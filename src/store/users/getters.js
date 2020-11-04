@@ -5,6 +5,18 @@ export function newUser(state) {
 	};
 	return loginDetail;
 }
+
+export function getAuthUser(state) {
+	let userDetails = {
+		id: state.auth.id,
+		username: state.auth.username,
+		email: state.auth.email,
+		phone: state.auth.phone,
+		gender: state.auth.gender
+	};
+	return userDetails;
+}
+
 export function getAdmin(state) {
 	return state.auth.authorizeGenAdmin;
 }

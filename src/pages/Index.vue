@@ -1,6 +1,6 @@
 <template>
   <div class="content-centered">
-    <div class="banner">
+    <div class="banner gt-sm">
       <div class="banner-inner">
         <div class="date">
           <span class="day big-text q-pr-lg">{{ openingBal.day }}</span>
@@ -201,11 +201,210 @@
         </q-card>
       </q-dialog>
     </div>
-    <div
-      class="q-my-lg row q-gutter-lg"
-      style="width: 100%; margin: 1rem auto;"
-    >
-      <div class="col-md-3">
+    <div class="small-banner lt-md">
+      <div class="small-banner-inner">
+        <div class="date q-mr-lg">
+          <span class="day small-medium-text q-pr-sm">{{ openingBal.day }}</span>
+          <span class="month small-medium-text  q-pr-lg">{{ openingBal.month }}</span>
+        </div>
+        <div class="small-balance">
+          <span class="naira-sign small-medium-text" v-html="nairaSign"></span>
+          <span class="amount small-big-text">{{
+            formatNumber(openingBal.amount)
+          }}</span>
+        </div>
+        <br>
+        <div class="crudBtn q-gutter-md">
+          <q-btn
+            @click="responseDialog = true"
+            round
+            color="primary"
+            icon="fas fa-plus-circle"
+          />
+          <q-btn
+            round
+            color="primary"
+            icon="fas fa-pen-square"
+            @click="
+              editMode = true;
+              prompt = true;
+            "
+          />
+          <q-btn
+            round
+            color="red"
+            icon="fas fa-trash"
+            @click="deleteResponse = true"
+          />
+        </div>
+      </div>
+      <!-- Dialog for adding and editting Opening Balance -->
+      <q-dialog v-model="prompt" persistent>
+        <q-card style="min-width: 350px" v-if="!editMode">
+          <q-card-section>
+            <div class="text-h6">Add Opening Balance</div>
+          </q-card-section>
+          <q-form @submit.prevent="createOpeningBal">
+            <q-card-section class="q-pt-none">
+              <q-input
+                dense
+                type="number"
+                v-model="balanceFormData.amount"
+                autofocus
+                placeholder="Amount"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+              <q-input
+                dense
+                placeholder="Date"
+                type="date"
+                v-model="balanceFormData.date_created"
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="text-primary">
+              <q-btn flat label="Add" type="submit" />
+              <q-btn flat label="Cancle" v-close-popup />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+        <!-- if in Edit Mode -->
+        <q-card style="min-width: 350px" v-if="editMode">
+          <q-card-section>
+            <div class="text-h6">Edit Opening Balance</div>
+          </q-card-section>
+          <q-form @submit.prevent="editOpeningBal">
+            <q-card-section class="q-pt-none">
+              <q-input
+                dense
+                placeholder="Amount"
+                type="number"
+                v-model.trim="openingBal.amount"
+                autofocus
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="text-primary">
+              <q-btn flat label="Edit" type="submit" />
+              <q-btn
+                flat
+                label="Cancle"
+                @click="editMode = false"
+                v-close-popup
+              />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+      </q-dialog>
+      <!-- Dialog to display option for balace brought down -->
+      <q-dialog
+        v-model="responseDialog"
+        transition-show="scale"
+        transition-hide="scale"
+      >
+        <q-card class="bg-blue-12 text-white" style="width: 430px">
+          <q-card-section>
+            <div class="text-h6">Before you Proceed</div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none">
+            Would you like to use this Remaining Balance...?
+          </q-card-section>
+
+          <q-card-actions align="right" class="bg-white text-blue-12">
+            <q-btn
+              flat
+              label="Yes, use balance"
+              @click="
+                dateReponseModal = true;
+                responseDialog = false;
+              "
+            />
+            <q-btn
+              flat
+              label="No, Add new balance"
+              @click="
+                prompt = true;
+                responseDialog = false;
+              "
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <!-- Dialog for deleting Opening balance -->
+      <q-dialog
+        v-model="deleteResponse"
+        persistent
+        transition-show="scale"
+        transition-hide="scale"
+      >
+        <q-card class="bg-red-12 text-white" style="width: 430px">
+          <q-card-section>
+            <div class="text-h6 text-center">
+              <i class="fas fa-exclamation-triangle"></i> Warning
+            </div>
+          </q-card-section>
+
+          <q-card-section class="q-pt-none text-center">
+            Are you sure about this..?
+          </q-card-section>
+
+          <q-card-actions align="right" class="bg-white text-blue-12">
+            <q-btn flat label="Yes" @click="deleteBal(openingBal.id)" />
+            <q-btn flat label="Cancle" @click="deleteResponse = false" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <!-- Date Response Modal Dialog -->
+      <q-dialog
+        v-model="dateReponseModal"
+        persistent
+        transition-show="scale"
+        transition-hide="scale"
+      >
+        <q-card style="width: 430px">
+          <q-card-section>
+            <div class="text-weight-formatDateer">
+              Please Enter the Date to be used for this opening balance
+            </div>
+          </q-card-section>
+          <q-form @submit.prevent="balanceBroughtDown">
+            <q-card-section class="q-pt-none">
+              <q-input
+                :rules="[
+                  val => (val && val.length > 0) || 'This field is required'
+                ]"
+                dense
+                type="date"
+                v-model="balanceFormData.date_created"
+              />
+            </q-card-section>
+
+            <q-card-actions align="right" class="bg-white text-blue-12">
+              <q-btn flat label="submit" type="submit" />
+              <q-btn
+                flat
+                label="cancle"
+                @click="
+                  closeAllModal();
+                  dateReponseModal = false;
+                "
+              />
+            </q-card-actions>
+          </q-form>
+        </q-card>
+      </q-dialog>
+    </div>
+    <div class="q-my-lg row q-gutter-lg" style="width: 100%; margin: 1rem auto; gt-sm">
+      <div class="col-md-3 gt-sm">
         <q-form @submit.prevent="addExpenses">
           <q-card>
             <q-card-section>
@@ -276,7 +475,7 @@
           </q-card>
         </q-form>
       </div>
-      <div class="col-md-8">
+      <div class="col-md-8 gt-sm">
         <q-card>
           <q-card-section>
             <!-- my custom table -->
@@ -285,21 +484,46 @@
                 <p class="table-title text-primary medium-text">
                   Expense Record
                 </p>
-                <div class="sort-table">
-                  <q-input
-                    dense
-                    outlined
-                    type="text"
-                    v-model.trim="searchExpense"
-                    placeholder="Search"
-                  />
+
+                <div class="sort-table row q-gutter-sm">
+                     <q-btn-dropdown color="primary" glossy icon="sort">
+                      <q-list>
+                        <q-item clickable v-close-popup @click="searchByDate">
+                          <q-item-section>
+                            <q-item-label>Search by date</q-item-label>
+                          </q-item-section>
+                        </q-item>
+
+                        <q-item clickable v-close-popup @click="searchByTitle">
+                          <q-item-section>
+                            <q-item-label>Search by title</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-btn-dropdown>
+                    <input
+                      class="searchIn"
+                      ref="searchInput"
+                      v-on:blur="nuliffySearch"
+                      dense
+                      required
+                      outlined
+                      type="text"
+                      v-model.trim="searchExpense"
+                      placeholder="Search"
+                    />
+                    <q-btn
+                      icon="fas fa-search"
+                      color="blue-12"
+                      @click="searchFilter"
+                     />
                 </div>
               </div>
               <div class="table-data">
                 <q-separator class="q-my-sm" />
                 <!-- your main table data starts here -->
                 <div class="main-data">
-                  <q-markup-table v-if="expenses.length">
+                  <q-markup-table v-if="expenses.length || searchResults.length">
                     <thead>
                       <tr>
                         <th class="text-left text-weight-formatDateer">
@@ -311,6 +535,9 @@
                         <th class="text-center text-weight-formatDateer">
                           Description
                         </th>
+                        <th class="text-center text-weight-formatDateer">
+                          Date
+                        </th>
                         <th class="text-center text-weight-formatDate">
                           Made by
                         </th>
@@ -319,12 +546,46 @@
                         </th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="searchResults.length || searchMsg.length">
+                      <tr v-for="result in searchResults" :key="result.id">
+                        <td class="text-left">{{ result.title }}</td>
+
+                        <td class="text-right">&#8358; {{ result.amount }}</td>
+                        <td class="text-center">{{ result.description }}</td>
+                        <td class="text-center">{{ result.date_of_expense }}</td>
+                        <td class="text-center">{{ result.made_by }}</td>
+                        <td class="text-right">
+                          <span class="col-md-4 q-gutter-sm">
+                            <!-- <q-btn
+                              size="10px"
+                              label="edit"
+                              type="submit"
+                              class="bg-primary text-white"
+                            /> -->
+                            <q-btn
+                              @click="trigerDelete(result.id, result.amount)"
+                              size="10px"
+                              label="delete"
+                              type="submit"
+                              class="bg-red-10 text-white"
+                            />
+                          </span>
+                        </td>
+                      </tr>
+                       <p v-if="searchMsg.length" class="text-center q-mt-md text-h6">
+                        {{ searchMsg }}
+                      </p>
+                      <q-inner-loading :showing="visible">
+                        <q-spinner size="50px" color="primary" />
+                      </q-inner-loading>
+                    </tbody>
+                    <tbody v-else>
                       <tr v-for="expense in expenses" :key="expense.id">
                         <td class="text-left">{{ expense.title }}</td>
 
                         <td class="text-right">&#8358; {{ expense.amount }}</td>
                         <td class="text-center">{{ expense.description }}</td>
+                        <td class="text-center">{{ expense.date_of_expense }}</td>
                         <td class="text-center">{{ expense.made_by }}</td>
                         <td class="text-right">
                           <span class="col-md-4 q-gutter-sm">
@@ -344,7 +605,11 @@
                           </span>
                         </td>
                       </tr>
+                      <q-inner-loading :showing="visible">
+                        <q-spinner size="50px" color="primary" />
+                      </q-inner-loading>
                     </tbody>
+
                   </q-markup-table>
                   <div v-else class="q-pa-md bg-info">
                     <p class="text-center q-mt-md text-h6">
@@ -358,6 +623,142 @@
         </q-card>
       </div>
     </div>
+    <!--- for mobile-->
+    <div style="width: 80%; margin: 1rem auto;" class="lt-md">
+      <div class="sort-table row q-gutter-sm">
+        <q-btn-dropdown color="blue-12" glossy icon="sort">
+        <q-list>
+          <q-item clickable v-close-popup @click="searchByDate">
+            <q-item-section>
+              <q-item-label>Search by date</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup @click="searchByTitle">
+            <q-item-section>
+              <q-item-label>Search by title</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+        </q-btn-dropdown>
+        <input
+          class="searchIn"
+          ref="searchInput"
+          dense
+          outlined
+          required
+          type="text"
+          v-on:blur="nuliffySearch"
+          v-model.trim="searchExpense"
+          placeholder="Search"
+        />
+           <q-btn
+            icon="fas fa-search"
+            color="blue-12"
+            @click="searchFilter"
+            />
+      </div>
+      <br>
+      <q-card>
+        <div v-if="expenses.length || searchResults.length">
+          <q-list v-if="searchResults.length || searchMsg.length"  bordered class="rounded-borders">
+              <q-expansion-item
+                v-for="result in searchResults"
+                :key="result.id"
+                expand-separator
+                icon="fas fa-chart-line"
+                :label="result.title"
+                :caption="'Made by: '+ result.made_by"
+              >
+                <q-card>
+                  <q-card-section>
+                    <div>
+                      <p class="q-mt-md text-h6">
+                        Description
+                      </p>
+                      <hr>
+                      <p>
+                        {{ result.description }}
+                      </p>
+                      <hr>
+                      <p class="q-mt-md text-h6">
+                        Amount
+                      </p>
+                      <p class="text-bold">
+                        &#8358; {{ result.amount }}
+                      </p>
+                      <hr>
+                        <q-btn
+                          @click="trigerDelete(resutl.id, result.amount)"
+                          size="15px"
+                          label="Delete"
+                          class="bg-red-10 text-white text-center"
+                        />
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
+            <q-card>
+              <p v-if="searchMsg" class="text-center q-mt-md text-h6">
+                No record found
+              </p>
+            </q-card>
+          </q-list>
+          <q-list v-else="expenses.length" bordered class="rounded-borders">
+            <q-expansion-item
+              v-for="expense in expenses"
+              :key="expense.id"
+              expand-separator
+              icon="fas fa-chart-line"
+              :label="expense.title"
+              :caption="'Made by: '+ expense.made_by"
+            >
+              <q-card>
+                <q-card-section>
+                  <div>
+                    <p class="q-mt-md text-h6">
+                      Description
+                    </p>
+                    <hr>
+                    <p>
+                      {{ expense.description }}
+                    </p>
+                    <hr>
+                    <p class="q-mt-md text-h6">
+                      Amount
+                    </p>
+                    <p class="text-bold">
+                      &#8358; {{ expense.amount }}
+                    </p>
+                    <hr>
+                      <q-btn
+                        @click="trigerDelete(expense.id, expense.amount)"
+                        size="15px"
+                        label="Delete"
+                        class="bg-red-10 text-white text-center"
+                      />
+                  </div>
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+          <q-card>
+            <p v-if="searchMsg" class="text-center q-mt-md text-h6">
+              No record found
+            </p>
+          </q-card>
+        </q-list>
+        </div>
+        <div v-else class="q-pa-md bg-info lt-md">
+            <p class="text-center q-mt-md text-h6">
+              No Expenses recorded for today
+          </p>
+        </div>
+      </q-card>
+      <q-page-sticky position="bottom-right" class="lt-md">
+        <q-btn class="text-white" to="/add-expense" fab icon="mdi-pencil" color="blue-12" />
+      </q-page-sticky>
+    </div>
+
   </div>
 </template>
 
@@ -374,6 +775,10 @@ export default {
     return {
       baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
+      visible: false,
+      isSearch: null,
+      searchResults: "",
+      searchMsg: "",
       dateReponseModal: false,
       deleteResponse: false,
       editMode: false,
@@ -402,10 +807,55 @@ export default {
       balanceFormData: {
         amount: "",
         date_created: ""
-      }
+      },
     };
   },
   methods: {
+    searchByDate() {
+      let getEl  = document.querySelector('.searchIn')
+      getEl.setAttribute('type', 'date');
+    },
+    searchByTitle() {
+      let getEl  = document.querySelector('.searchIn')
+      getEl.setAttribute('type', 'text');
+    },
+    nuliffySearch(){
+      this.searchMsg = "";
+      this.searchResults = ""
+      this.fetchExpenses();
+    },
+    searchFilter(){
+      console.log(this.searchExpense);
+       axios
+        .post(
+          this.baseUrl + "expenses/search", {searchdata: this.searchExpense},
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: "bearer" + Cookies.get("jwt_token")
+            }
+          }
+        )
+        .then(res => {
+          console.log(res);
+          let getEl  = document.querySelector('.searchIn')
+          if(getEl.value == ""){
+            this.expenses = "";
+            this.searchMsg = "";
+            this.fetchExpenses();
+          }
+          if(res.data.status == 200){
+            this.searchResults = res.data.data;
+          }
+          if(res.data.status == 404){
+            this.searchResults = "";
+            this.searchMsg = res.data.message;
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        });
+    },
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
@@ -456,7 +906,6 @@ export default {
     debitBal(id) {
       let newBalance = this.openingBal.amount - this.reduceBal;
       this.openingBal.amount = newBalance;
-
       axios
         .put(
           this.baseUrl + "opening-balance/reuse-bal/" + id,
@@ -538,6 +987,7 @@ export default {
           this.openingBal.month = date.formatDate(balDate, "MMM");
           this.openingBal.date = res.data.date_created;
           //console.log(this.openingBal);
+
         })
         .catch(err => {
           console.log(err.status);
@@ -700,12 +1150,14 @@ export default {
         })
         .then(res => {
           //console.log(res)
+          this.visible = true;
           if (res.data) {
             this.$store.commit("allExpenses", {
               expenses: res.data
             });
             this.expenses = res.data.data;
-            console.log(this.expenses);
+            this.visible = false
+            //console.log(this.expenses);
           }
         })
         .catch(err => {
@@ -786,6 +1238,7 @@ export default {
         });
     }
   },
+
   created() {
     this.fetchExpenses();
     this.fetchExpensesCategory();
@@ -812,21 +1265,46 @@ export default {
     0 6.7px 5.3px rgba(0, 0, 0, 0.048), 0 12.5px 10px rgba(0, 0, 0, 0.06),
     0 22.3px 17.9px rgba(0, 0, 0, 0.072), 0 41.8px 33.4px rgba(0, 0, 0, 0.086);
 }
+.small-banner {
+  background: #fff;
+  width: 80%;
+  margin: 1.3rem auto;
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.034),
+    0 6.7px 5.3px rgba(0, 0, 0, 0.048), 0 12.5px 10px rgba(0, 0, 0, 0.06),
+    0 22.3px 17.9px rgba(0, 0, 0, 0.072), 0 41.8px 33.4px rgba(0, 0, 0, 0.086);
+}
 .banner-inner {
-  padding: 0.7rem 10px;
+  padding: 0.7rem 0.7rem;
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
+.small-banner-inner {
+  padding: 0.5rem 0.5rem;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+}
 .date {
-  margin-right: -20px;
+  margin-right: -1.2rem;
 }
 .big-text {
-  font-size: 80px;
+  font-size: 2.6rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.small-big-text {
+  font-size: 1.6rem;
   font-family: Arial, Helvetica, sans-serif;
 }
 .medium-text {
-  font-size: 40px;
+  font-size: 1.7rem;
+  font-family: "Mitr", sans-serif;
+  font-weight: 550;
+}
+.small-medium-text {
+  font-size: 1rem;
   font-family: "Mitr", sans-serif;
   font-weight: 550;
 }
@@ -836,7 +1314,16 @@ export default {
 
 .balance {
   border: 1px solid lightgrey;
-  padding: 8px 130px;
+  padding: 0.5rem 4rem;
+  background: #f1f1f1;
+  -moz-box-shadow: inset 0 0 10px #000000;
+  -webkit-box-shadow: inset 0 0 10px #000000;
+  box-shadow: inset 0 0 10px #000000;
+}
+
+.small-balance {
+  border: 1px solid lightgrey;
+  padding: 0.2rem 1rem;
   background: #f1f1f1;
   -moz-box-shadow: inset 0 0 10px #000000;
   -webkit-box-shadow: inset 0 0 10px #000000;

@@ -3,10 +3,10 @@ export default function () {
   return {
 
     auth: {
+      isLogin: false,
       authorizeUser: false,
-      authorizeGenAdmin: false,
-      authorizeAdmin2: false,
       loadingBtn: true,
+      id: null,
       username: null,
       email: null,
       role: null,

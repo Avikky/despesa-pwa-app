@@ -19,11 +19,6 @@
         </q-toolbar-title>
         <q-tabs shrink class="gt-sm">
           <q-route-tab name="home" label="Home" to="/home"></q-route-tab>
-          <q-route-tab
-            name="expenses"
-            label="Expenses"
-            to="/expenses"
-          ></q-route-tab>
           <q-route-tab name="income" label="Income" to="/income"></q-route-tab>
           <q-route-tab
             name="customer"
@@ -46,9 +41,8 @@
           icon="fas fa-user-circle"
           label="Logout"
           @click="logout"
-          to="#"
         />
-        
+
         <q-btn
           id="menu-icon"
           class="lt-md shadow-2 q-mr-lg"
@@ -91,7 +85,7 @@
               glossy
               icon="fas fa-power-off"
               label="Logout"
-              to="#"
+              @click="logout"
             />
           </q-item-section>
         </q-item>
@@ -121,14 +115,9 @@ import EssentialLink from "components/EssentialLink.vue";
 
 const linksData = [
   {
-    title: "Dashboard",
+    title: "Home",
     icon: "fas fa-chart-th",
     link: "/home"
-  },
-  {
-    title: "Expenses",
-    icon: "fas fa-chart-line",
-    link: "/expenses"
   },
   {
     title: "Income",
@@ -157,6 +146,11 @@ const linksData = [
   //   link: "/file-manager"
   // }
 ];
+import * as store from "../store/users";
+import axios from "axios";
+import {
+  Cookies
+} from 'quasar';
 
 export default {
   name: "MainLayout",
@@ -164,7 +158,9 @@ export default {
   data() {
     return {
       drawerRight: false,
-      essentialLinks: linksData
+      essentialLinks: linksData,
+      baseUrl: "http://127.0.0.1:8000/api/",
+
     };
   },
   computed: {
@@ -174,7 +170,7 @@ export default {
   },
   methods: {
     logout(){
-      console.log('logout btn clicked')
+      this.$store.dispatch('logout', this.$store.getters.getAuthUser);
     }
   }
 };

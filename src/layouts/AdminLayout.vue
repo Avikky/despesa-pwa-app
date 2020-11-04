@@ -83,7 +83,7 @@
               glossy
               icon="fas fa-power-off"
               label="Logout"
-              to="#"
+              @click="logout"
             />
           </q-item-section>
         </q-item>
@@ -155,6 +155,11 @@ export default {
       drawerRight: true,
       essentialLinks: linksData
     };
+  },
+  methods: {
+    logout(){
+      this.$store.dispatch('logout', this.$store.getters.getAuthUser);
+    }
   }
 };
 </script>

@@ -56,7 +56,7 @@
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
-              
+
 
               <q-input
                 outlined
@@ -268,7 +268,7 @@ export default {
     getIncomeSourceType(){
       let rawCustomers = this.$store.getters.customers;
       if(this.tempSource == 'Customers') {
-        let customerNames =  
+        let customerNames =
         rawCustomers.map(item => {
           let name = item.name;
           return name;
@@ -383,7 +383,7 @@ export default {
               position: "top",
               type: "negative"
             });
-            
+
           }
           if (res.status == 200) {
             (this.incomeFormData.source = null),
@@ -400,7 +400,7 @@ export default {
                 type: "positive"
               });
             this.loadIncome();
-            
+
           }
         })
         .catch(res => {
@@ -421,7 +421,7 @@ export default {
       }
     },
 
-    updateIncome(){  
+    updateIncome(){
       axios
         .put(
           this.baseUrl + "income/update/" + this.singleIncome.id,
@@ -474,14 +474,14 @@ export default {
       this.incomeFormData.amount  = this.singleIncome.amount;
       this.incomeFormData.date_received  = this.singleIncome.date_received;
       this.incomeFormData.mop  = this.singleIncome.mop;
+
       if(this.singleIncome.vat_percentage == 'Nill' ){
         this.tempVat  = 'No';
+        this.getVatType();
       }else{
         this.tempVat  = 'Yes';
         this.incomeFormData.vat_percentage = this.singleIncome.vat_percentage
       }
-      
-      this.updateIncome(id);
 
       console.log('hello from edit')
 
@@ -494,7 +494,7 @@ export default {
     this.loadCustomers();
     this.loadIncome();
   },
- 
+
 
   mounted() {}
 };
