@@ -45,10 +45,6 @@ const routes = [
         component: () => import('pages/Report.vue')
       },
       {
-        path: '/add-expense',
-        component: () => import('components/AddExpense.vue')
-      },
-      {
         path: '/settings',
         component: () => import('pages/Settings.vue')
       },

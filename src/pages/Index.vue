@@ -704,7 +704,7 @@
               </p>
             </q-card>
           </q-list>
-          <q-list v-else="expenses.length" bordered class="rounded-borders">
+          <q-list v-if="expenses.length" bordered class="rounded-borders">
             <q-expansion-item
               v-for="expense in expenses"
               :key="expense.id"
@@ -755,10 +755,98 @@
         </div>
       </q-card>
       <q-page-sticky position="bottom-right" class="lt-md">
-        <q-btn class="text-white" to="/add-expense" fab icon="mdi-pencil" color="blue-12" />
+        <q-btn class="text-white" @click="smallAddForm = true" fab icon="mdi-pencil" color="blue-12" />
       </q-page-sticky>
     </div>
 
+
+
+    <q-dialog
+      v-model="smallAddForm"
+      full-height
+    >
+      <q-card class="full-height" style="width: 500px">
+        <q-card-section>
+          <div class="text-h6">Add EXpense</div>
+        </q-card-section>
+        <hr>
+        <q-card-section class="q-pt-none">
+          <q-form @submit.prevent="addExpenses">
+            <q-card>
+              <q-card-section>
+                <q-select
+                  ref="cate"
+                  required
+                  outlined
+                  v-model="tempCategory"
+                  value=""
+                  :options="categories"
+                  @input="getId()"
+                  label="Expense Category"
+                  :rules="[
+                    val => (val && val.length > 0) || 'This field is required'
+                  ]"
+                />
+                <br />
+                <q-input
+                  ref="title"
+                  outlined
+                  type="text"
+                  v-model.trim="expenseFormData.title"
+                  label="Title"
+                  :rules="[
+                    val => (val && val.length > 0) || 'This field is required'
+                  ]"
+                />
+                <br />
+                <q-input
+                  ref="desc"
+                  outlined
+                  type="text"
+                  v-model.trim="expenseFormData.description"
+                  label="Description"
+                  :rules="[
+                    val => (val && val.length > 0) || 'This field is required'
+                  ]"
+                />
+                <br />
+                <q-input
+                  ref="amt"
+                  outlined
+                  type="number"
+                  v-model.trim="expenseFormData.amount"
+                  label="Amount"
+                  :rules="[
+                    val => (val && val.length > 0) || 'This field is required'
+                  ]"
+                />
+                <br />
+                <q-input
+                  ref="by"
+                  outlined
+                  type="text"
+                  v-model.trim="expenseFormData.made_by"
+                  label="Made By"
+                  :rules="[
+                    val => (val && val.length > 0) || 'This field is required'
+                  ]"
+                />
+                <br />
+                <q-btn
+                  label="Add Expenses"
+                  type="submit"
+                  class="full-width bg-primary text-white"
+                />
+              </q-card-section>
+            </q-card>
+          </q-form>
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-white">
+          <q-btn color="red" label="Close" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -776,6 +864,7 @@ export default {
       baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
       visible: false,
+      smallAddForm: false,
       isSearch: null,
       searchResults: "",
       searchMsg: "",
