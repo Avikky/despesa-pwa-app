@@ -5,12 +5,12 @@ import { Cookies } from 'quasar';
 Vue.prototype.$axios = axios
 
 
-axios.defaults.baseURL = "http://127.0.0.1:8000/api/";
+axios.defaults.baseURL = process.env.BASEURL;
 
 const AUTH_TOKEN = Cookies.get("jwt_token");
 
 
-axios.interceptors.request.use( config => {  
+axios.interceptors.request.use( config => {
    if (AUTH_TOKEN) {
     config.headers.common["Authorization"] = "Bearer " + AUTH_TOKEN;
     config.headers.post["Content-Type"] = "application/json";
@@ -19,5 +19,5 @@ axios.interceptors.request.use( config => {
   }
   return config;
 }, (error) =>{
-  
+
 });

@@ -6,7 +6,7 @@
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
 
-module.exports = function ( /* ctx */ ) {
+module.exports = function (  ctx  ) {
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -44,6 +44,18 @@ module.exports = function ( /* ctx */ ) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+
+       distDir: ctx.mode.spa ? 'public' : null,
+
+        env: ctx.dev
+        ? {
+            // so on dev we'll have
+            BASEURL: "http://127.0.0.1:8000/api/"
+          }
+        : {
+            // and on build (production):
+            BASEURL: JSON.stringify("http://expensa.officeworks.com.ng/api/")
+          },
 
       // transpile: false,
 
