@@ -41,6 +41,10 @@ const routes = [
         component: () => import('pages/Customers.vue'),
       },
       {
+        path: '/expense-category',
+        component: () => import('pages/ExpenseCategory.vue'),
+      },
+      {
         path: '/report',
         component: () => import('pages/Report.vue')
       },

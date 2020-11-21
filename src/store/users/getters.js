@@ -43,6 +43,12 @@ export function customers(state) {
 	return state.customers.customerArr;
 }
 
+export function ExCategories(state) {
+
+  return state.expenseCategory.data;
+}
+
+
 export function income(state) {
 	//console.log(state.income.data);
 	return state.income.data;

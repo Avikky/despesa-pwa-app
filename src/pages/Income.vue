@@ -4,7 +4,7 @@
       class="q-my-lg row q-gutter-lg"
       style="width: 100%; margin: 1rem auto;"
     >
-      <div class="col-md-3">
+      <div class="col-md-3 gt-sm">
         <q-form @submit.prevent="modeCheck">
           <q-card>
             <q-card-section>
@@ -56,7 +56,6 @@
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
               />
-
 
               <q-input
                 outlined
@@ -261,10 +260,10 @@ export default {
     };
   },
   methods: {
+
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
-
     getIncomeSourceType(){
       let rawCustomers = this.$store.getters.customers;
       if(this.tempSource == 'Customers') {
@@ -282,14 +281,12 @@ export default {
         this.incomeFormData.vat_percentage = 'Nill';
       }
     },
-
     calTotal(){
       let vatDecimal = this.incomeFormData.vat / 100;
       let percentageVal = vatDecimal * this.incomeFormData.amount;
       let amnt = this.incomeFormData.amount - percentageVal;
       console.log(amnt);
     },
-
     loadCustomers() {
       axios
         .get(this.baseUrl + "customer/all", {
@@ -306,7 +303,6 @@ export default {
           console.log(err);
         });
     },
-
     getId() {
       if (this.tempSource) {
         console.log(this.tempSource);

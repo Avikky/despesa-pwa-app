@@ -506,7 +506,7 @@ export default {
               position: "top",
               type: "positive"
             });
-            
+
           }
         })
         .catch(err => {

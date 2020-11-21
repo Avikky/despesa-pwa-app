@@ -20,17 +20,10 @@
         <q-tabs shrink class="gt-sm">
           <q-route-tab name="home" label="Home" to="/home"></q-route-tab>
           <q-route-tab name="income" label="Income" to="/income"></q-route-tab>
-          <q-route-tab
-            name="customer"
-            label="Customers"
-            to="/customer"
-          ></q-route-tab>
+          <q-route-tab name="customer" label="Customers" to="/customer"></q-route-tab>
           <q-route-tab name="report" label="Report" to="/report"></q-route-tab>
-          <q-route-tab
-            name="settings"
-            label="Settings"
-            to="/settings"
-          ></q-route-tab>
+          <q-route-tab  name="settings" label="Settings" to="/settings"></q-route-tab>
+          <q-route-tab name="expense-category" label="Expense Category" to="/expense-category"></q-route-tab>
         </q-tabs>
         <q-space />
         <q-btn
@@ -135,16 +128,16 @@ const linksData = [
     link: "/report"
   },
   {
+    title: "Expense Category",
+    icon: "fas fa-file",
+    link: "/expense-category"
+  },
+  {
     title: "settings",
     icon: "fas fa-cog",
     link: "/settings"
   },
-  // {
-  //   title: "File Manager",
-  //   caption: "Comming Soon",
-  //   icon: "fas fa-file",
-  //   link: "/file-manager"
-  // }
+
 ];
 import * as store from "../store/users";
 import axios from "axios";
@@ -159,14 +152,11 @@ export default {
     return {
       drawerRight: false,
       essentialLinks: linksData,
-      baseUrl: "http://127.0.0.1:8000/api/",
 
     };
   },
   computed: {
-    auth: () => {
-      return users.getters.ifAuthenticated;
-    }
+
   },
   methods: {
     logout(){

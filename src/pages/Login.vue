@@ -31,7 +31,7 @@
               filled
               v-model.trim="loginDetails.email"
               type="email"
-              autocomplete
+              autocomplete="on"
               label="Email Address"
               class="q-mb-md"
               lazy-rules

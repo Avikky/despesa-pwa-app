@@ -19,6 +19,10 @@ export default function () {
       errorMsg: false
     },
 
+    expenseCategory: {
+      data: ""
+    },
+
     // income: {
     //   incomeData: "",
     //   Customers: "",
@@ -38,6 +42,8 @@ export default function () {
     income: {
       data: ""
     }
+
+
 
   }
 }

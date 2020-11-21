@@ -103,7 +103,7 @@ module.exports = function ( /* ctx */ ) {
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
-      pwa: false
+      pwa: true
     },
 
     // https://quasar.dev/quasar-cli/developing-pwa/configuring-pwa
@@ -111,8 +111,8 @@ module.exports = function ( /* ctx */ ) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `despesa`,
-        short_name: `despesa`,
+        name: `Expensa`,
+        short_name: `Expensa`,
         description: `Expense manager`,
         display: 'standalone',
         orientation: 'portrait',
@@ -177,7 +177,7 @@ module.exports = function ( /* ctx */ ) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'despesa'
+        appId: 'expensa'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

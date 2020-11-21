@@ -2,12 +2,12 @@ import axios from 'axios';
 import { Cookies } from 'quasar';
 import { Notify } from 'quasar';
 
-const baseUrl = 'http://127.0.0.1:8000/api/';
+// const baseUrl = 'http://127.0.0.1:8000/api/';
 export function register({
   commit
 }, userData) {
   axios
-    .post(baseUrl + 'auth/register', userData)
+    .post('auth/register', userData)
     .then((res) => {
       console.log(res);
       commit('authenticateUser', {
@@ -25,15 +25,10 @@ export function register({
 }
 export function login({ commit }, userData) {
   axios
-    .post('auth/login', userData, {
-      headers: {
-        Accept: 'application/json',
-        Authorization: 'bearer'
-      }
-    })
+    .post('auth/login', userData)
     .then((res) => {
       console.log(res)
-      if (res.data.error) {
+      if (res.data.errors || res.data.error) {
         Notify.create({
           type: 'negative',
           message: 'Email or Password incorrect'
@@ -94,7 +89,7 @@ export function login({ commit }, userData) {
 
 export function logout({commit}, userData) {
    axios
-     .post(baseUrl + "auth/logout", {userData}, {
+     .post("auth/logout", {userData}, {
        headers: {
          Accept: "application/json",
          Authorization: "bearer" + Cookies.get("jwt_token")

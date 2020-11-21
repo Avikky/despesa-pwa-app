@@ -61,6 +61,10 @@ export function storeCustomers(state, data) {
   state.customers.customerArr = data;
 }
 
+export function storeExpenseCategory(state, data) {
+  state.expenseCategory.data = data;
+}
+
 export function storeIncome(state, data) {
   console.log(data)
   state.income.data = data;
