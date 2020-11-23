@@ -861,7 +861,6 @@ export default {
   name: "home",
   data() {
     return {
-      baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
       visible: false,
       smallAddForm: false,
@@ -917,14 +916,7 @@ export default {
       console.log(this.searchExpense);
        axios
         .post(
-          this.baseUrl + "expenses/search", {searchdata: this.searchExpense},
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: "bearer" + Cookies.get("jwt_token")
-            }
-          }
-        )
+          this.baseUrl + "expenses/search", {searchdata: this.searchExpense})
         .then(res => {
           console.log(res);
           let getEl  = document.querySelector('.searchIn')
@@ -958,12 +950,7 @@ export default {
     deleteBal(id) {
       console.log("delete btn triggered");
       axios
-        .delete(this.baseUrl + "opening-balance/delete/" + id, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .delete("opening-balance/delete/" + id)
         .then(res => {
           //console.log(res.data);
           if (res.data.error) {
@@ -996,15 +983,8 @@ export default {
       let newBalance = this.openingBal.amount - this.reduceBal;
       this.openingBal.amount = newBalance;
       axios
-        .put(
-          this.baseUrl + "opening-balance/reuse-bal/" + id,
-          { amount: newBalance },
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: "bearer" + Cookies.get("jwt_token")
-            }
-          }
+        .put("opening-balance/reuse-bal/" + id,
+          { amount: newBalance }
         )
         .then(res => {})
         .catch(err => {
@@ -1016,12 +996,7 @@ export default {
       this.balanceFormData.date_created;
 
       axios
-        .post(this.baseUrl + "opening-balance/add", this.balanceFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("opening-balance/add", this.balanceFormData)
         .then(res => {
           console.log(res.data.status);
           if (res.data.errors) {
@@ -1055,12 +1030,7 @@ export default {
     },
     loadOpeningBal() {
       axios
-        .get(this.baseUrl + "opening-balance/last", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("opening-balance/last")
         .then(res => {
           let balDate = new Date(res.data.date_created);
           console.log(balDate.getDate());
@@ -1085,12 +1055,7 @@ export default {
     createOpeningBal() {
       console.log("create balance");
       axios
-        .post(this.baseUrl + "opening-balance/add", this.balanceFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("opening-balance/add", this.balanceFormData)
         .then(res => {
           console.log(res.data);
           if (res.data.errors) {
@@ -1124,18 +1089,10 @@ export default {
     editOpeningBal() {
       console.log("edit balance");
       axios
-        .put(
-          this.baseUrl + "opening-balance/edit/" + this.openingBal.id,
+        .put("opening-balance/edit/" + this.openingBal.id,
           {
             amount: this.openingBal.amount
-          },
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: "bearer" + Cookies.get("jwt_token")
-            }
-          }
-        )
+          })
         .then(res => {
           console.log(res);
           if (res.data.status == "success") {
@@ -1192,12 +1149,7 @@ export default {
       let balId = this.openingBal.id;
       console.log(this.expenseFormData);
       axios
-        .post(this.baseUrl + "expenses/store", this.expenseFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("expenses/store", this.expenseFormData)
         .then(() => {
           this.reduceBal = this.expenseFormData.amount;
           console.log("Expense Added Successfully.");
@@ -1231,12 +1183,7 @@ export default {
     },
     fetchExpenses() {
       axios
-        .get(this.baseUrl + "expenses/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("expenses/all")
         .then(res => {
           //console.log(res)
           this.visible = true;
@@ -1255,12 +1202,7 @@ export default {
     },
     fetchExpensesCategory() {
       axios
-        .get(this.baseUrl + "expense-category/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("expense-category/all")
         .then(res => {
           if (res.data.status == 401) {
             this.$store.commit("checkError", {
@@ -1289,11 +1231,7 @@ export default {
     },
     trigerDelete(expenseId, expenseAmt) {
       axios
-        .delete(this.baseUrl + "expenses/delete/" + expenseId, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          },
+        .delete("expenses/delete/" + expenseId,
           data: {
             balId: this.openingBal.id,
             amount: expenseAmt
