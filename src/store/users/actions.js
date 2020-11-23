@@ -25,7 +25,7 @@ export function register({
 }
 export function login({ commit }, userData) {
   this.axios
-    .post('auth-user/login', userData)
+    .post('auth/login', userData)
     .then((res) => {
       console.log(res)
       if (res.data.errors || res.data.error) {

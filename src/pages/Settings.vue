@@ -153,7 +153,7 @@ export default {
       this.user.gender = this.$store.getters.getAuthUser.gender;
     },
     basicInfoUpdate(){
-        axios
+        this.axios
         .put("settings/update-profile", this.user)
         .then(res => {
             console.log(res)
@@ -176,7 +176,7 @@ export default {
         });
     },
     changePassword(){
-        axios
+        this.axios
         .put("settings/reset-password", this.newpassword)
         .then(res => {
             console.log(res)

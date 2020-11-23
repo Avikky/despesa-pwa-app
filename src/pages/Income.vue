@@ -228,9 +228,8 @@
 <script>
 import * as store from "../store/users";
 // import axios from "axios";
-import { Cookies } from "quasar";
 import { date } from "quasar";
-import { Notify } from "quasar";
+
 export default {
   name: "home",
   data() {
@@ -259,7 +258,6 @@ export default {
     };
   },
   methods: {
-
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
@@ -287,7 +285,7 @@ export default {
       console.log(amnt);
     },
     loadCustomers() {
-      axios
+      this.axios
         .get("customer/all")
         .then( res => {
           console.log(res.data.data);
@@ -336,7 +334,7 @@ export default {
       this.singleIncome = oneIncome;
     },
     loadIncome(){
-      axios
+      this.axios
         .get("income/all")
         .then( res => {
           if(res.status == 200){
@@ -353,7 +351,7 @@ export default {
 
     addIncome(){
       console.log('hello from addIncome')
-       axios
+       this.axios
         .post("income/store", this.incomeFormData)
         .then(res => {
           console.log(res)
@@ -402,7 +400,7 @@ export default {
     },
 
     updateIncome(){
-      axios
+      this.axios
         .put(
           "income/update/" + this.singleIncome.id,
           this.incomeFormData)

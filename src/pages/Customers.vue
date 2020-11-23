@@ -401,12 +401,7 @@ export default {
     },
     trigerView(id) {
       this.axios
-        .get(this.baseUrl + "customer/single/" + id, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("customer/single/" + id)
         .then(res => {
           console.log(res.data.status);
           if (res.data.status.success) {
@@ -432,15 +427,12 @@ export default {
         this.customerType = false;
         this.customersFormData.category = this.tempCate;
       } else {
-
         this.tempCate = "others";
         this.customerType = true;
         this.specifyType = this.singleCustomer.category;
         this.customersFormData.category = this.specifyType;
       }
-
       this.customersFormData.name = this.singleCustomer.name;
-
       this.customersFormData.service_provided = this.singleCustomer.service_provided;
       this.customersFormData.payment_interval = this.singleCustomer.payment_interval;
       this.customersFormData.current_billing_date = this.singleCustomer.current_billing_date;
@@ -449,15 +441,8 @@ export default {
     },
     updateCustomer() {
       this.axios
-        .put(
-          this.baseUrl + "customer/update/" + this.customersFormData.id,
-          this.customersFormData,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: "bearer" + Cookies.get("jwt_token")
-            }
-          }
+        .put("customer/update/" + this.customersFormData.id,
+          this.customersFormData
         )
         .then(res => {
           if (res.errors) {
@@ -489,14 +474,10 @@ export default {
           console.log(err);
         });
     },
+
     trigerDelete(id) {
       this.axios
-        .delete(this.baseUrl + "customer/delete/" + id, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .delete("customer/delete/" + id)
         .then(res => {
           //console.log(res);
           if (res.data.success) {
@@ -521,12 +502,7 @@ export default {
     createCustomer() {
       //console.log("hello form create new customers");
       this.axios
-        .post(this.baseUrl + "customer/store", this.customersFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("customer/store", this.customersFormData)
         .then(res => {
           if (res.error) {
             this.$q.notify({
@@ -567,7 +543,7 @@ export default {
         console.log(this.customersFormData.category);
       }
       if (this.tempCate === "others") {
-        this.customerType = true;
+          this.customerType = true;
       }
     }
   },

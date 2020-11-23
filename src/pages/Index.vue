@@ -853,10 +853,9 @@
 <script>
 import * as store from "../store/users";
 // import axios from "axios";
-import { Cookies } from "quasar";
 import { date } from "quasar";
 import { openingBalance } from "../store/users/mutations";
-import { Notify } from "quasar";
+
 export default {
   name: "home",
   data() {
