@@ -54,7 +54,7 @@ module.exports = function (  ctx  ) {
           }
         : {
             // and on build (production):
-            BASEURL: JSON.stringify("http://expensa.officeworks.com.ng/api/")
+            BASEURL: "https://expensa.officeworks.com.ng/api/"
           },
 
       // transpile: false,
