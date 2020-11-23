@@ -297,7 +297,7 @@
 </template>
 <script>
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import { Cookies } from "quasar";
 import { date } from "quasar";
 import { Notify } from "quasar";
@@ -346,7 +346,7 @@ export default {
   },
   methods: {
     loadCustomers() {
-      axios
+      this.axios
         .get(this.baseUrl + "customer/all", {
           headers: {
             Accept: "application/json",
@@ -376,7 +376,7 @@ export default {
       console.log(oneCustomer);
     },
     loadSingleCustomerFromServer(id) {
-      axios
+      this.axios
         .get(this.baseUrl + "customer/single/" + id, {
           headers: {
             Accept: "application/json",
@@ -400,7 +400,7 @@ export default {
       }
     },
     trigerView(id) {
-      axios
+      this.axios
         .get(this.baseUrl + "customer/single/" + id, {
           headers: {
             Accept: "application/json",
@@ -448,7 +448,7 @@ export default {
       this.editMode = true;
     },
     updateCustomer() {
-      axios
+      this.axios
         .put(
           this.baseUrl + "customer/update/" + this.customersFormData.id,
           this.customersFormData,
@@ -490,7 +490,7 @@ export default {
         });
     },
     trigerDelete(id) {
-      axios
+      this.axios
         .delete(this.baseUrl + "customer/delete/" + id, {
           headers: {
             Accept: "application/json",
@@ -520,7 +520,7 @@ export default {
     },
     createCustomer() {
       //console.log("hello form create new customers");
-      axios
+      this.axios
         .post(this.baseUrl + "customer/store", this.customersFormData, {
           headers: {
             Accept: "application/json",

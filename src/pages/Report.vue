@@ -291,7 +291,7 @@
 </template>
 <script>
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import { Cookies } from "quasar";
 import { date } from "quasar";
 import { Notify } from "quasar";
@@ -358,7 +358,7 @@ export default {
         
         console.log(this.sortFormData);
 
-        axios
+        this.axios
         .post("report/generate", this.sortFormData)
         .then(res => {
             //console.log(res)
@@ -380,7 +380,7 @@ export default {
         });
     },
     getGrossReport(){
-             axios
+             this.axios
         .get("report/all")
         .then(res => {
             console.log(res)

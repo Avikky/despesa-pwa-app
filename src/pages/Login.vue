@@ -113,8 +113,8 @@ export default {
       rememberMe: false,
       user: "",
       loginDetails: {
-        email: "",
-        password: ""
+        email: "j@a.com",
+        password: "12345678"
         // rememberMe: false
       },
 

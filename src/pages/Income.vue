@@ -227,7 +227,7 @@
 
 <script>
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import { Cookies } from "quasar";
 import { date } from "quasar";
 import { Notify } from "quasar";

@@ -1,4 +1,4 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { Cookies } from 'quasar';
 import { Notify } from 'quasar';
 
@@ -6,7 +6,7 @@ import { Notify } from 'quasar';
 export function register({
   commit
 }, userData) {
-  axios
+  this.axios
     .post('auth/register', userData)
     .then((res) => {
       console.log(res);
@@ -24,8 +24,8 @@ export function register({
     });
 }
 export function login({ commit }, userData) {
-  axios
-    .post('auth/login', userData)
+  this.axios
+    .post('auth-user/login', userData)
     .then((res) => {
       console.log(res)
       if (res.data.errors || res.data.error) {
@@ -49,30 +49,33 @@ export function login({ commit }, userData) {
           gender: res.data.gender
         });
       }
-      if (res.data.user_role == 3) {
-        commit('checkIfAdmin', {
-          role: res.data.user_role
-        });
-        this.$router.push({
-          path: '/home'
-        });
-      }
-      if (res.data.user_role == 2) {
-        commit('checkIfAdmin', {
-          role: res.data.user_role
-        });
-        this.$router.push({
-          path: '/home'
-        });
-      }
-      if (res.data.user_role == 1) {
-        commit('checkIfAdmin', {
-          role: res.data.user_role
-        });
-        this.$router.push({
-          path: '/admin'
-        });
-      }
+      this.$router.push({
+        path: '/home'
+      });
+      // if (res.data.user_role == 3) {
+      //   commit('checkIfAdmin', {
+      //     role: res.data.user_role
+      //   });
+      //   this.$router.push({
+      //     path: '/home'
+      //   });
+      // }
+      // if (res.data.user_role == 2) {
+      //   commit('checkIfAdmin', {
+      //     role: res.data.user_role
+      //   });
+      //   this.$router.push({
+      //     path: '/home'
+      //   });
+      // }
+      // if (res.data.user_role == 1) {
+      //   commit('checkIfAdmin', {
+      //     role: res.data.user_role
+      //   });
+      //   this.$router.push({
+      //     path: '/admin'
+      //   });
+      // }
 
       //Still have some logic to process here using the cookies
 
@@ -88,7 +91,7 @@ export function login({ commit }, userData) {
 
 
 export function logout({commit}, userData) {
-   axios
+  this.axios
      .post("auth/logout", {userData}, {
        headers: {
          Accept: "application/json",
@@ -119,7 +122,7 @@ export function logout({commit}, userData) {
 export function fetchExpenses({
   commit
 }, userData) {
-  axios
+  this.axios
     .get(baseUrl + 'expenses/all', {
       headers: {
         Accept: 'application/json',
@@ -142,7 +145,7 @@ export function fetchExpenses({
 export function fetchExpenseCategory({
   commit
 }) {
-  axios
+  this.axios
     .get(baseUrl + "expense-category/all", {
       headers: {
         Accept: 'application/json',

@@ -852,7 +852,7 @@
 
 <script>
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import { Cookies } from "quasar";
 import { date } from "quasar";
 import { openingBalance } from "../store/users/mutations";
@@ -914,7 +914,7 @@ export default {
     },
     searchFilter(){
       console.log(this.searchExpense);
-       axios
+       this.axios
         .post("expenses/search", {searchdata: this.searchExpense})
         .then(res => {
           console.log(res);
@@ -948,7 +948,7 @@ export default {
     },
     deleteBal(id) {
       console.log("delete btn triggered");
-      axios
+      this.axios
         .delete("opening-balance/delete/" + id)
         .then(res => {
           //console.log(res.data);
@@ -981,7 +981,7 @@ export default {
     debitBal(id) {
       let newBalance = this.openingBal.amount - this.reduceBal;
       this.openingBal.amount = newBalance;
-      axios
+      this.axios
         .put("opening-balance/reuse-bal/" + id,
           { amount: newBalance }
         )
@@ -994,7 +994,7 @@ export default {
       this.balanceFormData.amount = this.openingBal.amount;
       this.balanceFormData.date_created;
 
-      axios
+      this.axios
         .post("opening-balance/add", this.balanceFormData)
         .then(res => {
           console.log(res.data.status);
@@ -1028,7 +1028,7 @@ export default {
         });
     },
     loadOpeningBal() {
-      axios
+      this.axios
         .get("opening-balance/last")
         .then(res => {
           let balDate = new Date(res.data.date_created);
@@ -1053,7 +1053,7 @@ export default {
     },
     createOpeningBal() {
       console.log("create balance");
-      axios
+      this.axios
         .post("opening-balance/add", this.balanceFormData)
         .then(res => {
           console.log(res.data);
@@ -1087,7 +1087,7 @@ export default {
     },
     editOpeningBal() {
       console.log("edit balance");
-      axios
+      this.axios
         .put("opening-balance/edit/" + this.openingBal.id,
           {
             amount: this.openingBal.amount
@@ -1147,7 +1147,7 @@ export default {
       this.expenseFormData.opening_bal_id = this.openingBal.id;
       let balId = this.openingBal.id;
       console.log(this.expenseFormData);
-      axios
+      this.axios
         .post("expenses/store", this.expenseFormData)
         .then(() => {
           this.reduceBal = this.expenseFormData.amount;
@@ -1181,7 +1181,7 @@ export default {
         });
     },
     fetchExpenses() {
-      axios
+      this.axios
         .get("expenses/all")
         .then(res => {
           //console.log(res)
@@ -1200,7 +1200,7 @@ export default {
         });
     },
     fetchExpensesCategory() {
-      axios
+      this.axios
         .get("expense-category/all")
         .then(res => {
           if (res.data.status == 401) {
@@ -1229,7 +1229,7 @@ export default {
       this.categories = categoriesByName;
     },
     trigerDelete(expenseId, expenseAmt) {
-      axios
+      this.axios
         .delete("expenses/delete/" + expenseId,
         {
           data: {

@@ -118,7 +118,7 @@
 </template>
 <script>
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import { Cookies } from "quasar";
 import { date } from "quasar";
 import { Notify } from "quasar";
@@ -140,7 +140,7 @@ export default {
   },
   methods: {
     loadCategories() {
-      axios
+      this.axios
         .get("expense-category/all")
         .then(res => {
           console.log(res.data.data);
@@ -179,7 +179,7 @@ export default {
       this.editMode = true;
     },
     updateCategory() {
-      axios
+      this.axios
         .put(
           "expense-category/update/" + this.category.id,this.category)
         .then(res => {
@@ -206,7 +206,7 @@ export default {
         });
     },
     trigerDelete(id) {
-      axios
+      this.axios
         .delete("expense-category/delete/" + id)
         .then(res => {
           //console.log(res);
@@ -231,7 +231,7 @@ export default {
     },
     createCategory() {
       //console.log("hello form create new customers");
-      axios
+      this.axios
         .post("expense-category/store", this.category)
         .then(res => {
           if (res.error) {
