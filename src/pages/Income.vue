@@ -235,7 +235,6 @@ export default {
   name: "home",
   data() {
     return {
-      baseUrl: "http://127.0.0.1:8000/api/",
       nairaSign: "&#x20A6;",
       editMode: false,
       editSource: false,
@@ -289,12 +288,7 @@ export default {
     },
     loadCustomers() {
       axios
-        .get(this.baseUrl + "customer/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("customer/all")
         .then( res => {
           console.log(res.data.data);
           this.$store.commit("storeCustomers", res.data.data);
@@ -343,12 +337,7 @@ export default {
     },
     loadIncome(){
       axios
-        .get(this.baseUrl + "income/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("income/all")
         .then( res => {
           if(res.status == 200){
             console.log(res.data.data);
@@ -365,12 +354,7 @@ export default {
     addIncome(){
       console.log('hello from addIncome')
        axios
-        .post(this.baseUrl + "income/store", this.incomeFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("income/store", this.incomeFormData)
         .then(res => {
           console.log(res)
           if (res.error) {
@@ -420,15 +404,8 @@ export default {
     updateIncome(){
       axios
         .put(
-          this.baseUrl + "income/update/" + this.singleIncome.id,
-          this.incomeFormData,
-          {
-            headers: {
-              Accept: "application/json",
-              Authorization: "bearer" + Cookies.get("jwt_token")
-            }
-          }
-        )
+          "income/update/" + this.singleIncome.id,
+          this.incomeFormData)
         .then(res => {
           if (res.errors) {
             this.$q.notify({

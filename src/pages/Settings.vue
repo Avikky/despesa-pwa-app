@@ -131,7 +131,6 @@ export default {
   name: "home",
   data() {
     return {
-       baseUrl: "http://127.0.0.1:8000/api/",
        user_id: "",
       user: {
         name: "",
@@ -155,12 +154,7 @@ export default {
     },
     basicInfoUpdate(){
         axios
-        .put(this.baseUrl + "settings/update-profile", this.user, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .put("settings/update-profile", this.user)
         .then(res => {
             console.log(res)
             if(res.status == 200){
@@ -183,12 +177,7 @@ export default {
     },
     changePassword(){
         axios
-        .put(this.baseUrl + "settings/reset-password", this.newpassword, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .put("settings/reset-password", this.newpassword)
         .then(res => {
             console.log(res)
             if(res.status == 200){

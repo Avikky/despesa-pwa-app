@@ -915,8 +915,7 @@ export default {
     searchFilter(){
       console.log(this.searchExpense);
        axios
-        .post(
-          this.baseUrl + "expenses/search", {searchdata: this.searchExpense})
+        .post("expenses/search", {searchdata: this.searchExpense})
         .then(res => {
           console.log(res);
           let getEl  = document.querySelector('.searchIn')
@@ -1232,6 +1231,7 @@ export default {
     trigerDelete(expenseId, expenseAmt) {
       axios
         .delete("expenses/delete/" + expenseId,
+        {
           data: {
             balId: this.openingBal.id,
             amount: expenseAmt

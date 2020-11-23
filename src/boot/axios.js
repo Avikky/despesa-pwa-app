@@ -2,12 +2,12 @@ import Vue from 'vue'
 import axios from 'axios'
 import { Cookies } from 'quasar';
 
-Vue.prototype.$axios = axios
-
 
 axios.defaults.baseURL = process.env.BASEURL;
 
-const AUTH_TOKEN = Cookies.get("jwt_token");
+const cookies = process.env.SERVER ? Cookies.parseSSR(ssrContext) : Cookies;
+
+const AUTH_TOKEN = cookies.get("jwt_token");
 
 
 axios.interceptors.request.use( config => {
@@ -19,5 +19,7 @@ axios.interceptors.request.use( config => {
   }
   return config;
 }, (error) =>{
-
+   return Promise.reject(error);
 });
+
+Vue.prototype.$axios = axios

@@ -298,7 +298,6 @@ import { Notify } from "quasar";
 export default {
   data() {
     return {
-        baseUrl: "http://127.0.0.1:8000/api/",
         expenseMode: false,
         incomeMode: false,
         openingBalMode: false,
@@ -360,12 +359,7 @@ export default {
         console.log(this.sortFormData);
 
         axios
-        .post(this.baseUrl + "report/generate", this.sortFormData, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .post("report/generate", this.sortFormData)
         .then(res => {
             //console.log(res)
             if(res.data.expenseData.length){
@@ -387,12 +381,7 @@ export default {
     },
     getGrossReport(){
              axios
-        .get(this.baseUrl + "report/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("report/all")
         .then(res => {
             console.log(res)
             this.Gxpenses = res.data.totalExpenses;
