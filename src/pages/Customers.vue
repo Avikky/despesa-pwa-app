@@ -298,13 +298,12 @@
 <script>
 import * as store from "../store/users";
 // import axios from "axios";
-import { Cookies } from "quasar";
+
 import { date } from "quasar";
-import { Notify } from "quasar";
+
 export default {
   data() {
     return {
-      baseUrl: "http://127.0.0.1:8000/api/",
       tempCate: "",
       isVisible: false,
       editMode: false,
@@ -347,12 +346,7 @@ export default {
   methods: {
     loadCustomers() {
       this.axios
-        .get(this.baseUrl + "customer/all", {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("customer/all")
         .then(res => {
           //console.log(res.data.data);
           this.$store.commit("storeCustomers", res.data.data);
@@ -377,12 +371,7 @@ export default {
     },
     loadSingleCustomerFromServer(id) {
       this.axios
-        .get(this.baseUrl + "customer/single/" + id, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "bearer" + Cookies.get("jwt_token")
-          }
-        })
+        .get("customer/single/" + id)
         .then(res => {
           this.singleCustomer = res.data.data;
           console.log(this.singleCustomer);
@@ -445,13 +434,6 @@ export default {
           this.customersFormData
         )
         .then(res => {
-          if (res.errors) {
-            this.$q.notify({
-              message: "Opps something went wrong",
-              position: "top",
-              type: "negative"
-            });
-          }
           if (res.data.status.success) {
             console.log(res.data);
             this.loadCustomers();
@@ -481,7 +463,6 @@ export default {
         .then(res => {
           //console.log(res);
           if (res.data.success) {
-            this.loadCustomers()
             this.$q.notify({
               message: "Record deleted successfully",
               position: "top",
@@ -489,14 +470,13 @@ export default {
             });
 
           }
+          this.loadCustomers();
         })
         .catch(err => {
           console.log(err);
-          this.$q.notify({
-            message: "Opps something went wrong!! ",
-            position: "top",
-            type: "negative"
-          });
+          if(err.response.status == 410){
+            document.location.reload(true);
+          }
         });
     },
     createCustomer() {

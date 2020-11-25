@@ -34,8 +34,8 @@ export function login({ commit }, userData) {
           message: 'Email or Password incorrect'
         })
       }
-      console.log(res);
-      let expiringTime = res.data.expires_in + new Date().getTime()
+      let expiringTime = res.data.expires_in /*+ new Date().getTime(); */
+      console.log(expiringTime);
       Cookies.set('jwt_token', res.data.access_token);
       Cookies.set('token_expireAt', expiringTime);
       if (res.data) {
@@ -92,12 +92,7 @@ export function login({ commit }, userData) {
 
 export function logout({commit}, userData) {
   this.axios
-     .post("auth/logout", {userData}, {
-       headers: {
-         Accept: "application/json",
-         Authorization: "bearer" + Cookies.get("jwt_token")
-       }
-     })
+     .post("auth/logout", {userData})
      .then(res => {
        console.log(res)
        if (res.status == 200) {

@@ -14,7 +14,7 @@
         </div>
         <div class="crudBtn q-gutter-md">
           <q-btn
-            @click="responseDialog = true"
+            @click="checkIfBalExist(openingBal)"
             round
             color="primary"
             icon="fas fa-plus-circle"
@@ -23,12 +23,14 @@
             round
             color="primary"
             icon="fas fa-pen-square"
+            v-if="editBtn"
             @click="
               editMode = true;
               prompt = true;
             "
           />
           <q-btn
+            v-if="delBtn"
             round
             color="red"
             icon="fas fa-trash"
@@ -216,7 +218,7 @@
         <br>
         <div class="crudBtn q-gutter-md">
           <q-btn
-            @click="responseDialog = true"
+            @click="checkIfBalExist(openingBal)"
             round
             color="primary"
             icon="fas fa-plus-circle"
@@ -541,9 +543,9 @@
                         <th class="text-center text-weight-formatDate">
                           Made by
                         </th>
-                        <th class="text-center text-weight-formatDate">
+                        <!-- <th class="text-center text-weight-formatDate">
                           Action
-                        </th>
+                        </th> -->
                       </tr>
                     </thead>
                     <tbody v-if="searchResults.length || searchMsg.length">
@@ -595,13 +597,13 @@
                               type="submit"
                               class="bg-primary text-white"
                             /> -->
-                            <q-btn
+                            <!-- <q-btn
                               @click="trigerDelete(expense.id, expense.amount)"
                               size="10px"
                               label="delete"
                               type="submit"
                               class="bg-red-10 text-white"
-                            />
+                            /> -->
                           </span>
                         </td>
                       </tr>
@@ -860,6 +862,8 @@ export default {
   name: "home",
   data() {
     return {
+      editBtn: false,
+      delBtn: false,
       nairaSign: "&#x20A6;",
       visible: false,
       smallAddForm: false,
@@ -934,6 +938,15 @@ export default {
         .catch(err => {
           console.log(err)
         });
+    },
+    checkIfBalExist(value){
+      if(value.date){
+        this.responseDialog = true;
+      }
+      if(!value.date){
+        this.responseDialog = false;
+        this.prompt = true;
+      }
     },
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -1030,6 +1043,8 @@ export default {
       this.axios
         .get("opening-balance/last")
         .then(res => {
+          this.editBtn = true;
+          this.delBtn =  true;
           let balDate = new Date(res.data.date_created);
           console.log(balDate.getDate());
           let day;
@@ -1047,7 +1062,11 @@ export default {
 
         })
         .catch(err => {
-          console.log(err.status);
+          console.log(err.response);
+          if(err.response.status == 404){
+            this.editBtn = false;
+            this.delBtn =  false;
+          }
         });
     },
     createOpeningBal() {
@@ -1163,7 +1182,7 @@ export default {
           this.fetchExpenses();
           this.$q.notify({
             message: "Expense Added Successfully",
-            position: "bottom-left",
+            position: "top",
             type: "positive"
           });
 
@@ -1174,7 +1193,7 @@ export default {
           console.log(err);
           this.$q.notify({
             message: "Opps Something went wrong",
-            position: "bottom-left",
+            position: "top",
             type: "negative"
           });
         });
@@ -1221,11 +1240,14 @@ export default {
     async getCategories() {
       await this.$store.getters.expenseCategory.data;
       let rawCategory = this.$store.getters.expenseCategory.data;
-      let categoriesByName = rawCategory.map(item => {
-        let name = item.name;
-        return name;
-      });
-      this.categories = categoriesByName;
+      if(rawCategory){
+         let categoriesByName = rawCategory.map(item => {
+          let name = item.name;
+          return name;
+          });
+          this.categories = categoriesByName;
+      }
+
     },
     trigerDelete(expenseId, expenseAmt) {
       this.axios

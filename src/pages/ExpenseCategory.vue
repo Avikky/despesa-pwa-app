@@ -11,7 +11,7 @@
               <q-input
                 outlined
                 type="text"
-                v-model.trim="category.name"
+                v-model="category.name"
                 label="Category Name"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
@@ -118,10 +118,7 @@
 </template>
 <script>
 import * as store from "../store/users";
-// import axios from "axios";
-import { Cookies } from "quasar";
 import { date } from "quasar";
-import { Notify } from "quasar";
 export default {
   data() {
     return {
@@ -143,12 +140,15 @@ export default {
       this.axios
         .get("expense-category/all")
         .then(res => {
-          console.log(res.data.data);
+          console.log(res);
           this.categories = res.data.data;
           this.$store.commit("storeExpenseCategory", res.data.data);
         })
         .catch(err => {
-          console.log(err);
+          //console.log(err.response);
+          if(err.response.status == 404){
+            console.log('No Category Found');
+          }
         });
     },
 
@@ -192,8 +192,8 @@ export default {
               type: "positive"
             });
             this.editMode = false;
-            this.category.name = null;
-            this.category.description = null;
+            this.category.name = "";
+            this.category.description = "";
           }
         })
         .catch(err => {
@@ -243,8 +243,8 @@ export default {
           }
           if (res.status) {
               this.editMode = false;
-              this.category.name = null;
-              this.category.description = null;
+              this.category.name = "";
+              this.category.description = "";
               this.$q.notify({
                 message: "Category Created Successfully",
                 position: "top",

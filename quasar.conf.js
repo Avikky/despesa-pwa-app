@@ -130,7 +130,8 @@ module.exports = function (  ctx  ) {
         orientation: 'portrait',
         background_color: '#f4f4f4',
         theme_color: '#448aff',
-        icons: [{
+        icons: [
+          {
             src: 'icons/icon-128x128.png',
             sizes: '128x128',
             type: 'image/png'
@@ -155,7 +156,8 @@ module.exports = function (  ctx  ) {
             sizes: '512x512',
             type: 'image/png'
           }
-        ]
+        ],
+        
       }
     },
 

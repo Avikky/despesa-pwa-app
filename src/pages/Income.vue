@@ -96,7 +96,7 @@
                 type="number"
                 min="0" max="99" step="any"
                 v-on:blur="calTotal"
-                v-model.trim="incomeFormData.vat"
+                v-model.trim="incomeFormData.vat_percentage"
                 label="Please specify Vat percentage"
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
@@ -204,12 +204,12 @@
                               label="Edit"
                               class="bg-primary text-white"
                             />
-                            <q-btn
+                            <!-- <q-btn
                               @click="trigerDelete()"
                               size="10px"
                               label="Delete"
                               class="bg-red-10 text-white"
-                            />
+                            /> -->
                           </span>
                         </td>
                       </tr>
@@ -279,10 +279,14 @@ export default {
       }
     },
     calTotal(){
-      let vatDecimal = this.incomeFormData.vat / 100;
-      let percentageVal = vatDecimal * this.incomeFormData.amount;
-      let amnt = this.incomeFormData.amount - percentageVal;
-      console.log(amnt);
+      if(this.incomeFormData.vat_percentage !== 'Nill'){
+        let vatValue = parseInt(this.incomeFormData.vat_percentage) ;
+        let vatDecimal = vatValue / 100;
+        let percentageVal = vatDecimal * this.incomeFormData.amount;
+        let amnt = this.incomeFormData.amount - percentageVal;
+        console.log(amnt);
+      }
+
     },
     loadCustomers() {
       this.axios
@@ -350,19 +354,12 @@ export default {
     },
 
     addIncome(){
-      console.log('hello from addIncome')
+      console.log(this.incomeFormData)
        this.axios
         .post("income/store", this.incomeFormData)
         .then(res => {
           console.log(res)
-          if (res.error) {
-            this.$q.notify({
-              message: "Opps something went wrong",
-              position: "top",
-              type: "negative"
-            });
-
-          }
+          
           if (res.status == 200) {
             (this.incomeFormData.source = null),
               (this.incomeFormData.vat = null),
@@ -382,11 +379,13 @@ export default {
           }
         })
         .catch(res => {
-          this.$q.notify({
-            message: "Opps something went wrong",
-            position: "top",
-            type: "negative"
-          });
+          if(res.response.status == 505){
+            this.$q.notify({
+              message: "Opps something went wrong",
+              position: "top",
+              type: "negative"
+            });
+          }
         });
     },
 
