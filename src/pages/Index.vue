@@ -597,13 +597,13 @@
                               type="submit"
                               class="bg-primary text-white"
                             /> -->
-                            <!-- <q-btn
+                            <q-btn
                               @click="trigerDelete(expense.id, expense.amount)"
                               size="10px"
                               label="delete"
                               type="submit"
                               class="bg-red-10 text-white"
-                            /> -->
+                            />
                           </span>
                         </td>
                       </tr>
