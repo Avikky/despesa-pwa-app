@@ -29,15 +29,15 @@ export default ({ store, urlPath }) => {
       store.dispatch('logout', store.getters.getAuthUser);
     }
 
-    setTimeout(logout, 8000000);
+    setTimeout(logout, 1000);
 
     function logoutAlert() {
       alert('Your Session expired Please login again');
     }
 
-    setTimeout(logoutAlert, 9000000);
+    setTimeout(logoutAlert, 2000);
 
-  
+
 
   Vue.prototype.axios = instance;
   store.axios = instance;
