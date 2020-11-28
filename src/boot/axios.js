@@ -24,21 +24,6 @@ export default ({ store, urlPath }) => {
     }
   );
 
-    function logout() {
-      console.log('logout triggered')
-      store.dispatch('logout', store.getters.getAuthUser);
-    }
-
-    setTimeout(logout, 1000);
-
-    function logoutAlert() {
-      alert('Your Session expired Please login again');
-    }
-
-    setTimeout(logoutAlert, 2000);
-
-
-
   Vue.prototype.axios = instance;
   store.axios = instance;
 };
