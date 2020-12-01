@@ -85,6 +85,8 @@
                 placeholder="Amount"
                 type="number"
                 v-model.trim="openingBal.amount"
+                step="0.01"
+                min="0"
                 autofocus
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
