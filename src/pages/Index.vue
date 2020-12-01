@@ -49,6 +49,7 @@
               <q-input
                 dense
                 type="number"
+                step="0.01"
                 v-model="balanceFormData.amount"
                 autofocus
                 placeholder="Amount"
@@ -82,12 +83,9 @@
             <q-card-section class="q-pt-none">
               <q-input
                 dense
-                placeholder="Amount"
                 type="number"
+                step="any"
                 v-model.trim="openingBal.amount"
-                step="0.01"
-                min="0"
-                autofocus
                 :rules="[
                   val => (val && val.length > 0) || 'This field is required'
                 ]"
@@ -580,7 +578,7 @@
                               type="submit"
                               class="bg-red-10 text-white"
                             >
-                          
+
                             </q-btn>
                           </span>
                         </td>
