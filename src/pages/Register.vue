@@ -133,6 +133,8 @@
           <q-btn
             size="19px"
             glossy
+            :loading="submitting"
+            :disabled="submitting"
             class="q-ma-md btn-blue"
             color="blue-14"
             type="submit"
@@ -152,6 +154,7 @@
 export default {
   data() {
     return {
+      submitting: false,
       userDetails: {
         name: "",
         email: "",
@@ -167,8 +170,17 @@ export default {
   },
   methods: {
     register() {
+      this.submitting = true;
       const formData = this.userDetails;
-      this.$store.dispatch("register", formData);
+      this.$store.dispatch("register", formData).then(res=>{
+        this.submitting = false;
+        this.$router.push({
+          path: '/login'
+        });
+      }).catch(err => {
+          this.submitting = false;
+          console.log(err.response)
+      });
     }
   }
 };

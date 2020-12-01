@@ -27,16 +27,28 @@
               <br />
               <q-btn
                 v-if="editMode"
+                :loading="isLoading"
+                :disabled="isLoading"
                 label="Edit Category"
                 type="submit"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner/>
+                </template>
+              </q-btn>
               <q-btn
                 v-else
+                :loading="isLoading"
+                :disabled="isLoading"
                 label="Create New Category"
                 type="submit"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner/>
+                </template>
+              </q-btn>
             </q-card-section>
           </q-card>
         </q-form>
@@ -122,6 +134,7 @@ import { date } from "quasar";
 export default {
   data() {
     return {
+      isLoading: false,
       isVisible: false,
       editMode: false,
       categories: "",
@@ -179,6 +192,7 @@ export default {
       this.editMode = true;
     },
     updateCategory() {
+      this.isLoading = true;
       this.axios
         .put(
           "expense-category/update/" + this.category.id,this.category)
@@ -186,6 +200,7 @@ export default {
           if (res.status == 200) {
             console.log(res.data);
             this.loadCategories();
+            this.isLoading = false;
             this.$q.notify({
               message: "Category Edited Successfullyy",
               position: "top",
@@ -197,6 +212,7 @@ export default {
           }
         })
         .catch(err => {
+          this.isLoading = false;
           console.log(err.response);
              this.$q.notify({
               message: "Opps.. something went wrong!",
@@ -230,6 +246,7 @@ export default {
         });
     },
     createCategory() {
+       this.isLoading = true;
       //console.log("hello form create new customers");
       this.axios
         .post("expense-category/store", this.category)
@@ -251,9 +268,11 @@ export default {
                 type: "positive"
               });
             this.loadCategories();
+             this.isLoading = false;
           }
         })
         .catch(res => {
+           this.isLoading = false;
           this.$q.notify({
             message: "Opps something went wrong",
             position: "top",

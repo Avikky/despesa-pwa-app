@@ -471,8 +471,14 @@
               <q-btn
                 label="Add Expenses"
                 type="submit"
+                :loading="expenseBtnLoading"
+                :disabled="expenseBtnLoading"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner />
+                </template>
+              </q-btn>
             </q-card-section>
           </q-card>
         </q-form>
@@ -568,9 +574,12 @@
                               @click="trigerDelete(result.id, result.amount)"
                               size="10px"
                               label="delete"
+                              :disabled="submitting"
                               type="submit"
                               class="bg-red-10 text-white"
-                            />
+                            >
+                          
+                            </q-btn>
                           </span>
                         </td>
                       </tr>
@@ -601,6 +610,7 @@
                               @click="trigerDelete(expense.id, expense.amount)"
                               size="10px"
                               label="delete"
+                              :disabled="submitting"
                               type="submit"
                               class="bg-red-10 text-white"
                             />
@@ -693,9 +703,15 @@
                         <q-btn
                           @click="trigerDelete(resutl.id, result.amount)"
                           size="15px"
+                          :disabled="submitting"
+                          :loading="submitting"
                           label="Delete"
                           class="bg-red-10 text-white text-center"
-                        />
+                        >
+                          <template v-slot:loading>
+                            <q-spinner />
+                          </template>
+                        </q-btn>
                     </div>
                   </q-card-section>
                 </q-card>
@@ -838,7 +854,13 @@
                   label="Add Expenses"
                   type="submit"
                   class="full-width bg-primary text-white"
-                />
+                  :loading="expenseBtnLoading"
+                  :disabled="expenseBtnLoading"
+                >
+                    <template v-slot:loading>
+                      <q-spinner />
+                    </template>
+                </q-btn>
               </q-card-section>
             </q-card>
           </q-form>
@@ -863,6 +885,7 @@ export default {
   data() {
     return {
       editBtn: false,
+      expenseBtnLoading: false,
       delBtn: false,
       nairaSign: "&#x20A6;",
       visible: false,
@@ -899,6 +922,8 @@ export default {
         amount: "",
         date_created: ""
       },
+      submitting: false,
+      visible: false
     };
   },
   methods: {
@@ -1161,6 +1186,7 @@ export default {
       this.responseDialog = false;
     },
     addExpenses() {
+      this.expenseBtnLoading = true;
       this.expenseFormData.date_of_expense = this.openingBal.date;
       this.expenseFormData.opening_bal_id = this.openingBal.id;
       let balId = this.openingBal.id;
@@ -1168,6 +1194,7 @@ export default {
       this.axios
         .post("expenses/store", this.expenseFormData)
         .then(() => {
+          this.expenseBtnLoading = false;
           this.reduceBal = this.expenseFormData.amount;
           console.log("Expense Added Successfully.");
           this.tempCategory = null;
@@ -1199,11 +1226,11 @@ export default {
         });
     },
     fetchExpenses() {
+      this.visible = true;
       this.axios
         .get("expenses/all")
         .then(res => {
           //console.log(res)
-          this.visible = true;
           if (res.data) {
             this.$store.commit("allExpenses", {
               expenses: res.data
@@ -1214,7 +1241,8 @@ export default {
           }
         })
         .catch(err => {
-          console.log(err.status);
+          this.visible = true;
+          //console.log(err.status);
         });
     },
     fetchExpensesCategory() {
@@ -1250,6 +1278,7 @@ export default {
 
     },
     trigerDelete(expenseId, expenseAmt) {
+      this.submitting = true;
       this.axios
         .delete("expenses/delete/" + expenseId,
         {
@@ -1259,6 +1288,7 @@ export default {
           }
         })
         .then(res => {
+          this.submitting = false;
           console.log(res.data.success);
           if (res.data.success) {
             this.loadOpeningBal();
@@ -1277,6 +1307,7 @@ export default {
           }
         })
         .catch(err => {
+          this.submitting = false;
           console.log(err);
           this.$q.notify({
             message: "Opps Something went wrong",

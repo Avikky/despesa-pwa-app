@@ -21,7 +21,7 @@ Vue.use(VueRouter)
  */
 
 export default function ( /* { store, ssrContext } */) {
-  
+
   const Router = new VueRouter({
     scrollBehavior: () => ({
       x: 0,
@@ -40,7 +40,7 @@ export default function ( /* { store, ssrContext } */) {
     var isAuthed = !!Cookies.get('jwt_token');
     var AuthExpire = Cookies.get('token_expireAt');
     let currentTime = new Date().getTime();
-    
+
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (!isAuthed) {
@@ -52,6 +52,7 @@ export default function ( /* { store, ssrContext } */) {
         });
       }
 
+      
       // if (currentTime > AuthExpire) {
       //   return next({
       //     path: "/login",

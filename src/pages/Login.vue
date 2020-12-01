@@ -83,6 +83,8 @@
             class="q-ma-md btn-blue"
             color="blue-14"
             type="submit"
+            :disabled="submitting"
+            :loading="submitting"
             label="Login Now"
           >
             <template v-slot:loading>
@@ -109,12 +111,12 @@ import store from "../store";
 export default {
   data() {
     return {
-      //submitting: this.$store.state.loadingBtn,
+      submitting: false,
       rememberMe: false,
       user: "",
       loginDetails: {
-        email: "",
-        password: ""
+        email: "user@user.com",
+        password: "Admin@101"
         // rememberMe: false
       },
 
@@ -124,8 +126,22 @@ export default {
   },
   methods: {
     login() {
+      this.submitting = true;
       let formData = this.loginDetails;
-      this.$store.dispatch("login", formData);
+      this.$store.dispatch("login", formData).then(res=>{
+        this.submitting = false;
+        console.log(res)
+      }).catch(err => {
+        this.submitting = false;
+          if(err.response.status == 422 || err.response.status == 401)
+          {
+            this.$q.notify({
+              message: "Email or Password incorrect",
+              position: "top",
+              type: "negative"
+            });
+          }
+      });
     },
     checkIfComingFromRegistra() {
       //console.log(this.$store.getters.newUser);

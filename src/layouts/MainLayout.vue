@@ -85,6 +85,7 @@
       </q-list>
     </q-drawer>
 
+    <AutoLogout />
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -105,6 +106,7 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
+import AutoLogout from "components/AutoLogout.vue";
 
 const linksData = [
   {
@@ -140,14 +142,14 @@ const linksData = [
 
 ];
 import * as store from "../store/users";
-import axios from "axios";
+// import axios from "axios";
 import {
   Cookies
 } from 'quasar';
 
 export default {
   name: "MainLayout",
-  components: { EssentialLink },
+  components: { EssentialLink, AutoLogout },
   data() {
     return {
       drawerRight: false,

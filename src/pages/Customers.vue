@@ -77,14 +77,26 @@
                 v-if="editMode"
                 label="Edit Customer"
                 type="submit"
+                :loading="loading"
+                :disabled="loading"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner />
+                </template>
+              </q-btn>
               <q-btn
                 v-else
+                :disabled="loading"
+                :loading="loading"
                 label="Create New Customer"
                 type="submit"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner />
+                </template>
+              </q-btn>
             </q-card-section>
           </q-card>
         </q-form>
@@ -159,8 +171,11 @@
                               @click="trigerDelete(customer.id)"
                               size="10px"
                               label="Delete"
+                              :disabled="deleteBtnLoading"
                               class="bg-red-10 text-white"
-                            />
+                            >
+                             
+                            </q-btn>
                           </span>
                         </td>
                       </tr>
@@ -304,6 +319,8 @@ import { date } from "quasar";
 export default {
   data() {
     return {
+      visible: false,
+      deleteBtnLoading: false,
       tempCate: "",
       isVisible: false,
       editMode: false,
@@ -340,7 +357,8 @@ export default {
         service_provided: "",
         payment_interval: "",
         current_billing_date: ""
-      }
+      },
+      loading: false,
     };
   },
   methods: {
@@ -429,11 +447,13 @@ export default {
       this.editMode = true;
     },
     updateCustomer() {
+      this.loading = true;
       this.axios
         .put("customer/update/" + this.customersFormData.id,
           this.customersFormData
         )
         .then(res => {
+          this.loading = false;
           if (res.data.status.success) {
             console.log(res.data);
             this.loadCustomers();
@@ -453,14 +473,18 @@ export default {
           }
         })
         .catch(err => {
+          this.loading = false;
           console.log(err);
         });
     },
 
     trigerDelete(id) {
+      this.deleteBtnLoading = true;
       this.axios
         .delete("customer/delete/" + id)
         .then(res => {
+          this.deleteBtnLoading = false;
+
           //console.log(res);
           if (res.data.success) {
             this.$q.notify({
@@ -474,16 +498,20 @@ export default {
         })
         .catch(err => {
           console.log(err);
+          this.deleteBtnLoading = false;
+
           if(err.response.status == 410){
             document.location.reload(true);
           }
         });
     },
     createCustomer() {
+      this.loading =  true;
       //console.log("hello form create new customers");
       this.axios
         .post("customer/store", this.customersFormData)
         .then(res => {
+          this.loading = false;
           if (res.error) {
             this.$q.notify({
               message: "Opps something went wrong",

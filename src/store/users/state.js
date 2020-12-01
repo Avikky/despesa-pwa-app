@@ -4,8 +4,6 @@ export default function () {
 
     auth: {
       isLogin: false,
-      authorizeUser: false,
-      loadingBtn: true,
       id: null,
       username: null,
       email: null,

@@ -128,15 +128,27 @@
                 <q-btn
                 v-if="editSource == false"
                 label="Add Income"
+                :loading="loading"
+                :disbaled="loading"
                 type="submit"
                 class="full-width bg-primary text-white"
-              />
+                >
+                    <template v-slot:loading>
+                      <q-spinner />
+                    </template>
+                </q-btn>        
               <q-btn
                 v-else
                 label="Update Income"
+                :loading="loading"
+                :disbaled="loading"
                 type="submit"
                 class="full-width bg-primary text-white"
-              />
+              >
+                <template v-slot:loading>
+                  <q-spinner />
+                </template>
+              </q-btn> 
             </q-card-section>
           </q-card>
         </q-form>
@@ -213,6 +225,9 @@
                           </span>
                         </td>
                       </tr>
+                       <q-inner-loading :showing="visible">
+                        <q-spinner size="50px" color="primary" />
+                      </q-inner-loading>
                     </tbody>
                   </q-markup-table>
                 </div>
@@ -234,6 +249,7 @@ export default {
   name: "home",
   data() {
     return {
+      visible: false,
       nairaSign: "&#x20A6;",
       editMode: false,
       editSource: false,
@@ -254,7 +270,8 @@ export default {
         amount: "",
         date_received: "",
         mop: ""
-      }
+      },
+      loading: false,
     };
   },
   methods: {
@@ -354,6 +371,7 @@ export default {
     },
 
     addIncome(){
+      this.loading = true;
       console.log(this.incomeFormData)
        this.axios
         .post("income/store", this.incomeFormData)
@@ -375,10 +393,11 @@ export default {
                 type: "positive"
               });
             this.loadIncome();
-
+            this.loading = false;
           }
         })
         .catch(res => {
+          this.loading = false;
           if(res.response.status == 505){
             this.$q.notify({
               message: "Opps something went wrong",
@@ -399,6 +418,7 @@ export default {
     },
 
     updateIncome(){
+      this.loading = true;
       this.axios
         .put(
           "income/update/" + this.singleIncome.id,
@@ -429,8 +449,10 @@ export default {
               (this.incomeFormData.amount = null);
 
           }
+          this.loading = false;
         })
         .catch(err => {
+          this.loading = false;
           console.log(err);
         });
     },
