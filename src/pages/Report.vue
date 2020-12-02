@@ -111,7 +111,7 @@
                             <tr v-for="item in incomeSorted" :key="item.id">
                                 <td class="text-left">{{item.source}}</td>
                                 <td class="text-center">{{item.description}}</td>
-                                <td class="text-right">&#8358; {{item.amount}}</td>
+                                <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
                                 <td class="text-center">{{item.vat_percentage}}</td>
                                 <td class="text-center">{{item.mop}}</td>
                                 <td class="text-center">{{item.date_received}}</td>
@@ -136,7 +136,7 @@
                                 <td class="text-center">{{item.title}}</td>
                                 <td class="text-center">{{item.description}}</td>
                                 <td class="text-center">{{item.made_by}}</td>
-                                <td class="text-right">&#8358; {{item.amount}}</td>
+                                <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
                             </tr>
                             <tr>
                                 <td></td>
@@ -180,7 +180,7 @@
                                             <p>  
                                                 <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                                                <span class="text-white text-h6"> {{Gxpenses}}</span>
+                                                <span class="text-white text-h6"> {{formatNumber(Gxpenses)}}</span>
                                             </p> 
                                         </div>
                                     </q-card-section>
@@ -199,7 +199,7 @@
                                             <p>  
                                                 <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                                                <span class="text-white text-h6">{{Gincome}}</span>
+                                                <span class="text-white text-h6">{{ formatNumber(Gincome)}}</span>
                                             </p> 
                                         </div>
                                     </q-card-section>
@@ -217,7 +217,7 @@
                                             <p>  
                                                 <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                                                <span class="text-white text-h6"> {{ Gprofit }}</span>
+                                                <span class="text-white text-h6"> {{ formatNumber(Gprofit) }}</span>
                                             </p> 
                                         </div>
                                     </q-card-section>
@@ -248,7 +248,7 @@
                                     <tr v-for="item in incomeSorted" :key="item.id">
                                         <td class="text-left">{{item.date_received}}</td>
                                         <td class="text-center">{{item.description}}</td>
-                                        <td class="text-right">&#8358; {{item.amount}}</td>
+                                        <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
                                     </tr>
                                     </tbody>
                                 </q-markup-table>
@@ -273,7 +273,7 @@
                                     <tr v-for="item in expenseSorted" :key="item.id">
                                         <td class="text-left">{{item.date_of_expense}}</td>
                                         <td class="text-center">{{item.title}}</td>
-                                        <td class="text-right">&#8358; {{item.amount}}</td>
+                                        <td class="text-right">&#8358; {{ formatNumber(item.amount)}}</td>
                                     </tr>
                                     </tbody>
                                 </q-markup-table>
@@ -324,6 +324,9 @@ export default {
     //        this.years.push(i)
     //     }
     // },
+    formatNumber(num) {
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    },
     switchTab(value){
         console.log(value)
         if(value == 'expense'){

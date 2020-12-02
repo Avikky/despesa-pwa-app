@@ -204,7 +204,7 @@
                       <tr v-for="item in income" :key="item.id">
                         <td class="text-left">{{item.source}}</td>
                         <td class="text-center">{{item.description}}</td>
-                        <td class="text-right">&#8358; {{item.amount}}</td>
+                        <td class="text-right">&#8358; {{ formatNumber(item.amount)}}</td>
                         <td class="text-center">{{item.vat_percentage}}</td>
                          <td class="text-center">{{item.mop}}</td>
                         <td class="text-center">{{item.date_received}}</td>
@@ -406,6 +406,10 @@ export default {
             });
           }
         });
+    },
+
+    formatNumber(num) {
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
 
     modeCheck() {

@@ -8,7 +8,8 @@
         </div>
         <div class="balance">
           <span class="naira-sign medium-text" v-html="nairaSign"></span>
-          <span class="amount big-text">{{
+          <span class="amount big-text">
+            {{
             formatNumber(openingBal.amount)
           }}</span>
         </div>
@@ -25,8 +26,8 @@
             icon="fas fa-pen-square"
             v-if="editBtn"
             @click="
-              editMode = true;
-              prompt = true;
+            editMode = true;
+            prompt = true;
             "
           />
           <q-btn
@@ -558,7 +559,7 @@
                       <tr v-for="result in searchResults" :key="result.id">
                         <td class="text-left">{{ result.title }}</td>
 
-                        <td class="text-right">&#8358; {{ result.amount }}</td>
+                        <td class="text-right">&#8358; {{ formatNumber(result.amount) }}</td>
                         <td class="text-center">{{ result.description }}</td>
                         <td class="text-center">{{ result.date_of_expense }}</td>
                         <td class="text-center">{{ result.made_by }}</td>
@@ -884,6 +885,7 @@ export default {
   name: "home",
   data() {
     return {
+      validateAmt: /^\d+(?:\.\d{1,2})?$/,
       editBtn: false,
       expenseBtnLoading: false,
       delBtn: false,
