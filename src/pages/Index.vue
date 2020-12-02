@@ -252,6 +252,7 @@
               <q-input
                 dense
                 type="number"
+                                step="any"
                 v-model="balanceFormData.amount"
                 autofocus
                 placeholder="Amount"
@@ -287,6 +288,7 @@
                 dense
                 placeholder="Amount"
                 type="number"
+                                step="any"
                 v-model.trim="openingBal.amount"
                 autofocus
                 :rules="[
@@ -451,6 +453,7 @@
                 ref="amt"
                 outlined
                 type="number"
+                                step="any"
                 v-model.trim="expenseFormData.amount"
                 label="Amount"
                 :rules="[
@@ -833,6 +836,7 @@
                   ref="amt"
                   outlined
                   type="number"
+                                  step="any"
                   v-model.trim="expenseFormData.amount"
                   label="Amount"
                   :rules="[
