@@ -25,30 +25,32 @@
               />
 
               <br />
-              <q-btn
-                v-if="editMode"
-                :loading="isLoading"
-                :disabled="isLoading"
-                label="Edit Category"
-                type="submit"
-                class="full-width bg-primary text-white"
-              >
-                <template v-slot:loading>
-                  <q-spinner/>
-                </template>
-              </q-btn>
-              <q-btn
-                v-else
-                :loading="isLoading"
-                :disabled="isLoading"
-                label="Create New Category"
-                type="submit"
-                class="full-width bg-primary text-white"
-              >
-                <template v-slot:loading>
-                  <q-spinner/>
-                </template>
-              </q-btn>
+              <span v-if="userRole == 1">
+                <q-btn
+                  v-if="editMode"
+                  :loading="isLoading"
+                  :disabled="isLoading"
+                  label="Edit Category"
+                  type="submit"
+                  class="full-width bg-primary text-white"
+                >
+                  <template v-slot:loading>
+                    <q-spinner/>
+                  </template>
+                </q-btn>
+                <q-btn
+                  v-else
+                  :loading="isLoading"
+                  :disabled="isLoading"
+                  label="Create New Category"
+                  type="submit"
+                  class="full-width bg-primary text-white"
+                >
+                  <template v-slot:loading>
+                    <q-spinner/>
+                  </template>
+                </q-btn>
+              </span>
             </q-card-section>
           </q-card>
         </q-form>
@@ -85,14 +87,14 @@
                         <th class="text-center text-weight-bold">
                           Description
                         </th>
-                        <th class="text-right text-weight-bold">Action</th>
+                        <th class="text-right text-weight-bold" v-if="userRole == 1">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-for="category in categories" :key="category.id">
                         <td class="text-left">{{ category.name }}</td>
                         <td class="text-center">{{ category.description }}</td>
-                        <td class="text-right">
+                        <td class="text-right" v-if="userRole == 1">
                           <span class="col-md-4 q-gutter-sm">
                             <q-btn
                               @click="
@@ -145,7 +147,8 @@ export default {
         id: "",
         name: "",
         description: ""
-      }
+      },
+      userRole: "",
     };
   },
   methods: {
@@ -280,10 +283,18 @@ export default {
           });
         });
     },
+    getAuthUserRole(){
+      this.userRole = this.$q.cookies.get('role');
+      console.log(this.userRole);
+    }
   },
   created() {
+    this.getAuthUserRole();
     this.loadCategories();
   },
+  mounted(){
+    this.getAuthUserRole();
+  }
 };
 </script>
 

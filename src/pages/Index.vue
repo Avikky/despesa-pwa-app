@@ -1330,19 +1330,21 @@ export default {
         });
     },
     getAuthUserRole(){
-      let role = this.$q.cookies.get('role');
-      this.userRole = role;
+      this.userRole = this.$q.cookies.get('role');
+      console.log(this.userRole);
     }
   },
 
   created() {
+    this.getAuthUserRole();
     this.fetchExpenses();
     this.fetchExpensesCategory();
     this.formatNumber();
-    this.getAuthUserRole();
+    
   },
 
   mounted() {
+    this.getAuthUserRole();
     this.closeAllModal();
     this.getId();
     this.loadOpeningBal();

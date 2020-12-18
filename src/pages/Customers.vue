@@ -361,6 +361,7 @@ export default {
         current_billing_date: ""
       },
       loading: false,
+      userRole: "",
     };
   },
   methods: {
@@ -555,12 +556,18 @@ export default {
       if (this.tempCate === "others") {
           this.customerType = true;
       }
+    },
+    getAuthUserRole(){
+      this.userRole = this.$q.cookies.get('role');
+      console.log(this.userRole);
     }
   },
   created() {
+    this.getAuthUserRole();
     this.loadCustomers();
   },
   mounted() {
+    this.getAuthUserRole();
     this.getOthers();
   }
 };

@@ -489,7 +489,8 @@ export default {
     },
 
     getAuthUserRole(){
-      this.userRole = this.$q.cookies.get('role');;
+      this.userRole = this.$q.cookies.get('role');
+      console.log(this.userRole);
     }
     
 
@@ -502,7 +503,9 @@ export default {
   },
 
 
-  mounted() {}
+  mounted() {
+    this.getAuthUserRole();
+  }
 };
 </script>
 <style scoped>

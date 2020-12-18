@@ -43,10 +43,10 @@ export function login({ commit }, userData) {
         Cookies.set('jwt_token', res.data.access_token);
         Cookies.set('token_expireAt', res.data.expires_in);
         if (res.data) {
-
+          console.log(res.data.user_role);
           Cookies.set('name', res.data.username);
           Cookies.set('email', res.data.email);
-          Cookies.set('role', res.data.role);
+          Cookies.set('role', res.data.user_role);
 
           commit('authenticateUser', {
             isLogin: true,
@@ -100,6 +100,9 @@ export function logout({commit}, userData) {
         commit('logout');
          Cookies.remove('jwt_token')
          Cookies.remove('token_expireAt')
+          Cookies.remove('name', res.data.username);
+          Cookies.remove('email', res.data.email);
+          Cookies.remove('role', res.data.role);
          this.$router.push('/login');
        } else {
          this.$q.notify({
