@@ -13,7 +13,7 @@
             formatNumber(openingBal.amount)
           }}</span>
         </div>
-        <div class="crudBtn q-gutter-md">
+        <div v-if="userRole == 1" class="crudBtn q-gutter-md">
           <q-btn
             @click="checkIfBalExist(openingBal)"
             round
@@ -217,7 +217,7 @@
           }}</span>
         </div>
         <br>
-        <div class="crudBtn q-gutter-md">
+        <div v-if="userRole == 1" class="crudBtn q-gutter-md">
           <q-btn
             @click="checkIfBalExist(openingBal)"
             round
@@ -473,6 +473,7 @@
               />
               <br />
               <q-btn
+              v-if="userRole == 1"
                 label="Add Expenses"
                 type="submit"
                 :loading="expenseBtnLoading"
@@ -575,6 +576,7 @@
                               class="bg-primary text-white"
                             /> -->
                             <q-btn
+                            v-if="userRole == 1"
                               @click="trigerDelete(result.id, result.amount)"
                               size="10px"
                               label="delete"
@@ -611,6 +613,7 @@
                               class="bg-primary text-white"
                             /> -->
                             <q-btn
+                            v-if="userRole == 1"
                               @click="trigerDelete(expense.id, expense.amount)"
                               size="10px"
                               label="delete"
@@ -705,6 +708,7 @@
                       </p>
                       <hr>
                         <q-btn
+                        v-if="userRole == 1"
                           @click="trigerDelete(resutl.id, result.amount)"
                           size="15px"
                           :disabled="submitting"
@@ -754,6 +758,7 @@
                     </p>
                     <hr>
                       <q-btn
+                      v-if="userRole == 1"
                         @click="trigerDelete(expense.id, expense.amount)"
                         size="15px"
                         label="Delete"
@@ -836,7 +841,7 @@
                   ref="amt"
                   outlined
                   type="number"
-                                  step="any"
+                  step="any"
                   v-model.trim="expenseFormData.amount"
                   label="Amount"
                   :rules="[
@@ -856,6 +861,7 @@
                 />
                 <br />
                 <q-btn
+                v-if="userRole == 1"
                   label="Add Expenses"
                   type="submit"
                   class="full-width bg-primary text-white"
@@ -929,7 +935,8 @@ export default {
         date_created: ""
       },
       submitting: false,
-      visible: false
+      visible: false,
+      userRole: "",
     };
   },
   methods: {
@@ -1321,6 +1328,10 @@ export default {
             type: "negative"
           });
         });
+    },
+    getAuthUserRole(){
+      let role = this.$q.cookies.get('role');
+      this.userRole = role;
     }
   },
 
@@ -1328,6 +1339,7 @@ export default {
     this.fetchExpenses();
     this.fetchExpensesCategory();
     this.formatNumber();
+    this.getAuthUserRole();
   },
 
   mounted() {

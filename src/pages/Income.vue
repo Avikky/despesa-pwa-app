@@ -125,30 +125,33 @@
                 ]"
               />
               <br />
+              <span v-if="userRole == 1">
                 <q-btn
-                v-if="editSource == false"
-                label="Add Income"
-                :loading="loading"
-                :disbaled="loading"
-                type="submit"
-                class="full-width bg-primary text-white"
+                  v-if="editSource == false"
+                  label="Add Income"
+                  :loading="loading"
+                  :disbaled="loading"
+                  type="submit"
+                  class="full-width bg-primary text-white"
+                  >
+                      <template v-slot:loading>
+                        <q-spinner />
+                      </template>
+                  </q-btn>        
+                <q-btn
+                  v-else
+                  label="Update Income"
+                  :loading="loading"
+                  :disbaled="loading"
+                  type="submit"
+                  class="full-width bg-primary text-white"
                 >
-                    <template v-slot:loading>
-                      <q-spinner />
-                    </template>
-                </q-btn>        
-              <q-btn
-                v-else
-                label="Update Income"
-                :loading="loading"
-                :disbaled="loading"
-                type="submit"
-                class="full-width bg-primary text-white"
-              >
-                <template v-slot:loading>
-                  <q-spinner />
-                </template>
-              </q-btn> 
+                  <template v-slot:loading>
+                    <q-spinner />
+                  </template>
+                </q-btn> 
+
+              </span>
             </q-card-section>
           </q-card>
         </q-form>
@@ -197,7 +200,7 @@
                         <th class="text-center text-weight-bold">
                           Date Received
                         </th>
-                        <th class="text-center text-weight-bold">Action</th>
+                        <th v-if="userRole == 1" class="text-center text-weight-bold">Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -208,9 +211,10 @@
                         <td class="text-center">{{item.vat_percentage}}</td>
                          <td class="text-center">{{item.mop}}</td>
                         <td class="text-center">{{item.date_received}}</td>
-                        <td class="text-right">
+                        <td class="text-right" v-if="userRole == 1">
                           <span class="col-md-4 q-gutter-sm">
                             <q-btn
+                            v-if="userRole == 1"
                               @click="trigerEdit(item.id); editMode = true;"
                               size="10px"
                               label="Edit"
@@ -272,6 +276,7 @@ export default {
         mop: ""
       },
       loading: false,
+      userRole: "",
     };
   },
   methods: {
@@ -483,10 +488,15 @@ export default {
 
     },
 
+    getAuthUserRole(){
+      this.userRole = this.$q.cookies.get('role');;
+    }
+    
+
   },
 
   created() {
-    //this.formatNumber();
+    this.getAuthUserRole()
     this.loadCustomers();
     this.loadIncome();
   },

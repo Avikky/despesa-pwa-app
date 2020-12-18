@@ -12,7 +12,8 @@ export function getAuthUser(state) {
 		username: state.auth.username,
 		email: state.auth.email,
 		phone: state.auth.phone,
-		gender: state.auth.gender
+		gender: state.auth.gender,
+		role: state.auth.role
 	};
 	return userDetails;
 }

@@ -43,6 +43,11 @@ export function login({ commit }, userData) {
         Cookies.set('jwt_token', res.data.access_token);
         Cookies.set('token_expireAt', res.data.expires_in);
         if (res.data) {
+
+          Cookies.set('name', res.data.username);
+          Cookies.set('email', res.data.email);
+          Cookies.set('role', res.data.role);
+
           commit('authenticateUser', {
             isLogin: true,
             id: res.data.id,

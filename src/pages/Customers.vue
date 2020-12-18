@@ -4,7 +4,7 @@
       class="q-my-lg row q-gutter-lg"
       style="width: 100%; margin: 1rem auto;"
     >
-      <div class="col-md-3">
+      <div class="col-xs-12 col-md-3">
         <q-form @submit.prevent="modeCheck">
           <q-card>
             <q-card-section>
@@ -73,14 +73,15 @@
                 </template>
               </q-input>
               <br />
-              <q-btn
-                v-if="editMode"
-                label="Edit Customer"
-                type="submit"
-                :loading="loading"
-                :disabled="loading"
-                class="full-width bg-primary text-white"
-              >
+              <span v-if="userRole == 1">
+                  <q-btn
+                  v-if="editMode"
+                  label="Edit Customer"
+                  type="submit"
+                  :loading="loading"
+                  :disabled="loading"
+                  class="full-width bg-primary text-white"
+                >
                 <template v-slot:loading>
                   <q-spinner />
                 </template>
@@ -97,11 +98,12 @@
                   <q-spinner />
                 </template>
               </q-btn>
+              </span>
             </q-card-section>
           </q-card>
         </q-form>
       </div>
-      <div class="col-md-8">
+      <div class="col-xs-12 col-md-8">
         <q-card>
           <q-card-section>
             <!-- my custom table -->
@@ -136,7 +138,7 @@
                         <th class="text-center text-weight-bold">
                           Service Provided
                         </th>
-                        <th class="text-center text-weight-bold">Action</th>
+                        <th class="text-center text-weight-bold" v-if="userRole == 1">Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -146,7 +148,7 @@
                         <td class="text-right">
                           {{ customer.service_provided }}
                         </td>
-                        <td class="text-right">
+                        <td class="text-right" v-if="userRole == 1">
                           <span class="col-md-4 q-gutter-sm">
                             <q-btn
                               @click="
