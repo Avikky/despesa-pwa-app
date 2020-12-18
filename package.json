@@ -1,8 +1,8 @@
 {
-  "name": "despesa",
+  "name": "Expensa",
   "version": "0.0.1",
   "description": "Expense manager",
-  "productName": "despesa",
+  "productName": "Expensa",
   "author": "Anih Victor <victordecency@gmail.com>",
   "private": true,
   "scripts": {

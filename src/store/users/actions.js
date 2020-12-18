@@ -63,22 +63,22 @@ export function login({ commit }, userData) {
         this.$router.push({
           path: '/home'
         });
-        if (res.data.user_role == 3) {
-          commit('checkIfAdmin', {
-            role: res.data.user_role
-          });
-          this.$router.push({
-            path: '/home'
-          });
-        }
-        if (res.data.user_role == 2) {
-          commit('checkIfAdmin', {
-            role: res.data.user_role
-          });
-          this.$router.push({
-            path: '/home'
-          });
-        }
+        // if (res.data.user_role == 3) {
+        //   commit('checkIfAdmin', {
+        //     role: res.data.user_role
+        //   });
+        //   this.$router.push({
+        //     path: '/home'
+        //   });
+        // }
+        // if (res.data.user_role == 2) {
+        //   commit('checkIfAdmin', {
+        //     role: res.data.user_role
+        //   });
+        //   this.$router.push({
+        //     path: '/home'
+        //   });
+        // }
 
 
       // Let the calling function know that http is done. You may send some data back
