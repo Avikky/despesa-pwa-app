@@ -329,7 +329,7 @@ export default {
       billingDate: "",
       editCustomer: false,
       paymentInterval: [
-        'One Time Payment'
+        'One Time Payment',
         "Daily",
         "Weekly",
         "1 Month",
