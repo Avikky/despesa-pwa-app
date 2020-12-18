@@ -39,7 +39,6 @@ export function login({ commit }, userData) {
       .post('auth/login', userData)
       .then((res) => {
         console.log(res)
-
         Cookies.set('jwt_token', res.data.access_token);
         Cookies.set('token_expireAt', res.data.expires_in);
         if (res.data) {
@@ -59,27 +58,13 @@ export function login({ commit }, userData) {
             role: res.data.role,
             gender: res.data.gender
           });
+          
         }
+
         this.$router.push({
           path: '/home'
         });
-        // if (res.data.user_role == 3) {
-        //   commit('checkIfAdmin', {
-        //     role: res.data.user_role
-        //   });
-        //   this.$router.push({
-        //     path: '/home'
-        //   });
-        // }
-        // if (res.data.user_role == 2) {
-        //   commit('checkIfAdmin', {
-        //     role: res.data.user_role
-        //   });
-        //   this.$router.push({
-        //     path: '/home'
-        //   });
-        // }
-
+        
 
       // Let the calling function know that http is done. You may send some data back
         resolve(res);

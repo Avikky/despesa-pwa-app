@@ -70,6 +70,7 @@
               <q-input
                 outlined
                 type="number"
+                step="any"
                 v-model.trim="incomeFormData.amount"
                 label="Amount"
                 :rules="[
