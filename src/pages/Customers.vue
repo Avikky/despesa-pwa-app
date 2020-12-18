@@ -64,9 +64,6 @@
                 outlined
                 type="date"
                 v-model.trim="customersFormData.current_billing_date"
-                :rules="[
-                  val => (val && val.length > 0) || 'This field is required'
-                ]"
               >
                 <template v-slot:hint>
                   Current Billing Date
@@ -332,6 +329,7 @@ export default {
       billingDate: "",
       editCustomer: false,
       paymentInterval: [
+        'One Time Payment'
         "Daily",
         "Weekly",
         "1 Month",
