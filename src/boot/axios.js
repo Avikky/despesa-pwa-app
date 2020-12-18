@@ -16,6 +16,7 @@ export default ({ store, urlPath }) => {
       if (AUTH_TOKEN) {
         config.headers.Authorization = "Bearer " + AUTH_TOKEN;
         config.headers.post["Content-Type"] = "application/json";
+        axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
       }
 
       return config;
