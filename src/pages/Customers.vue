@@ -372,7 +372,7 @@ export default {
           this.customers = this.$store.getters.customers;
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response);
         });
     },
     mergeVal() {

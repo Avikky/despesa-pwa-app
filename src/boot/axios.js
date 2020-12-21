@@ -16,7 +16,7 @@ export default ({ store, urlPath }) => {
       if (AUTH_TOKEN) {
         config.headers.Authorization = "Bearer " + AUTH_TOKEN;
         config.headers.post["Content-Type"] = "application/json";
-        config.headers.common['Access-Control-Allow-Origin'] = '*';
+        config.headers.common['Access-Control-Allow-Origin'] = 'https://expensa.vercel.app';
       }
 
       return config;
