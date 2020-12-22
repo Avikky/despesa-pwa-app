@@ -9,10 +9,10 @@
             <q-list bordered separator>
                 <q-item clickable v-ripple>
                     <q-item-section @click="switchTab('general')">General</q-item-section>
-                </q-item> 
+                </q-item>
                 <q-item clickable v-ripple>
                     <q-item-section @click="switchTab('expense')">Expenses</q-item-section>
-                </q-item> 
+                </q-item>
                 <q-item clickable v-ripple>
                     <q-item-section @click="switchTab('income')">Income</q-item-section>
                 </q-item>
@@ -20,7 +20,7 @@
                     <q-item-section @click="switchTab('bal')">All Openning Balances</q-item-section>
                 </q-item>
             </q-list>
-        
+
         </div>
       </div>
       <div class="col-md-8">
@@ -46,8 +46,20 @@
                 <q-separator class="q-my-sm" />
                 <!-- your main table data starts here -->
                 <div class="main-data">
-                    <q-form @submit.prevent="sortReport">
+                    <q-form v-if="!generalMode" @submit.prevent="sortReport">
                         <div class="row q-gutter-md justify-center">
+                            <div v-if="expenseMode" class="col-md-3">
+                                <label for="startDate">Select Expense Category</label><br>
+                                 <select v-model="sortFormData.expenseCateID" style="padding: 12px;" name="expenseCategory" id="" >
+                                   <option v-for="category in categories" :key="category.id" :value="category.id">{{category.name}}</option>
+                                 </select>
+                            </div>
+                             <div v-if="incomeMode" class="col-md-3">
+                                <label for="startDate">Select Customer</label><br>
+                                 <select v-model="sortFormData.customerName" style="padding: 12px;" name="expenseCategory" id="" >
+                                   <option v-for="customer in customers" :key="customer.id" :value="customer.name">{{customer.name}}</option>
+                                 </select>
+                            </div>
                             <div class="col-md-3">
                                 <label for="startDate">Start Date</label>
                                 <q-input
@@ -67,8 +79,8 @@
                                     dense
                                     id="endDate"
                                     type="Date"
-                                    v-model="sortFormData.sortTo"  
-                                />   
+                                    v-model="sortFormData.sortTo"
+                                />
                             </div>
                             <div class="col-md-2">
                                 <q-btn
@@ -81,6 +93,7 @@
                         </div>
                     </q-form>
                     <br><br>
+                    <p v-if="generalMode" class="text-h6 text-blue-12 text-center">GROSS TOTAL</p>
                     <hr>
                     <br>
                     <div class="justify-center" v-if=incomeMode>
@@ -125,7 +138,7 @@
                             <tr>
                                 <th class="text-left text-weight-bolder">Date</th>
                                 <th class="text-center text-weight-bolder">Title</th>
-                                <th class="text-center text-weight-bolder">Description</th> 
+                                <th class="text-center text-weight-bolder">Description</th>
                                 <th class="text-center text-weight-bolder">Made By</th>
                                 <th class="text-right text-weight-bolder">Amount</th>
                             </tr>
@@ -139,17 +152,22 @@
                                 <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
                             </tr>
                             <tr>
-                                <td></td>
+                                <td>
+                                  <span style="font-size: 35px; font-weight: bolder;">ToTal: </span>
+                                  <span style="font-size: 20px; font-weight: bold;">&#8358;
+                                    {{formatNumber(totalSearchExp)}}
+                                  </span>
+                                </td>
                             </tr>
                             </tbody>
-                        </q-markup-table>  
+                        </q-markup-table>
                     </div>
                     <div class="row justify-center" v-if="openingBalMode">
                         <q-markup-table>
                             <thead>
                             <tr>
                                 <th class="text-left text-weight-bolder">
-                                    Date 
+                                    Date
                                 </th>
                                 <th class="text-center text-weight-bolder">
                                     Amount
@@ -166,119 +184,98 @@
                         </q-markup-table>
                     </div>
                     <div v-if="generalMode">
-                        <p class="text-h6 text-blue-12 text-center">GROSS TOTAL</p>
+                      <q-form @submit.prevent="sortReport">
                         <div class="row q-gutter-md justify-center">
                             <div class="col-md-3">
-                                <q-card class="my-card">
-                                    <q-card-section class="bg-negative">
-                                        <p class="text-white  text-bold">
-                                            <i class="fas fa-chart-line fa-2x text-white"></i>
-                                            <span class=""> Total Expenses</span>
-                                        </p>
-                                        <hr>
-                                        <div class="text-subtitle1">
-                                            <p>  
-                                                <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
-
-                                                <span class="text-white text-h6"> {{formatNumber(Gxpenses)}}</span>
-                                            </p> 
-                                        </div>
-                                    </q-card-section>
-                                    
-                                </q-card>
+                                <label for="startDate">Start Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    id="startDate"
+                                    dense
+                                    type="Date"
+                                    v-model="sortFormData.sortFrom"
+                                />
                             </div>
                             <div class="col-md-3">
-                                <q-card class="my-card">
-                                    <q-card-section class="bg-blue-12">
-                                        <p class="text-white  text-bold">
-                                            <i class="fas fa-bolt fa-2x text-white"></i>
-                                            <span class=""> Total Income</span>
-                                        </p>
-                                        <hr>
-                                        <div class="text-subtitle1">
-                                            <p>  
-                                                <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
-
-                                                <span class="text-white text-h6">{{ formatNumber(Gincome)}}</span>
-                                            </p> 
-                                        </div>
-                                    </q-card-section>
-                                </q-card>
+                                <label for="endDate">End Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    dense
+                                    id="endDate"
+                                    type="Date"
+                                    v-model="sortFormData.sortTo"
+                                />
                             </div>
-                            <div class="col-md-3">
-                                <q-card class="my-card">
-                                    <q-card-section class="bg-positive">
-                                        <p class="text-white  text-bold">
-                                            <i class="fas fa-chart-pie  fa-2x text-white"></i>
-                                            <span class=""> Total Profit</span>
-                                        </p>
-                                        <hr>
-                                        <div class="text-subtitle1">
-                                            <p>  
-                                                <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
-
-                                                <span class="text-white text-h6"> {{ formatNumber(Gprofit) }}</span>
-                                            </p> 
-                                        </div>
-                                    </q-card-section>
-                                </q-card>
+                            <div class="col-md-2">
+                                <q-btn
+                                    icon="sort"
+                                    label="Generate"
+                                    type="submit"
+                                    class="full-width bg-primary text-white q-mt-lg"
+                                />
                             </div>
                         </div>
+                      </q-form>
+                    <br><br>
+                      <div class="row q-gutter-md justify-center">
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-negative">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-chart-line fa-2x text-white"></i>
+                                        <span class=""> Total Expenses</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                        <br><br>
-                        <hr>
-                        <div class="row justify-center main-data q-gutter-md">
-                            <div class="col-md-5">
-                                <p class="text-h6 text-blue-12 row justify-center">Income</p>
-                                <q-markup-table>
-                                    <thead>
-                                    <tr>
-                                        <th class="text-left text-weight-bolder">
-                                            Date
-                                        </th>
-                                        <th class="text-right text-weight-bolder">
-                                            Description
-                                        </th>
-                                        <th class="text-right text-weight-bolder">
-                                            Income
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="item in incomeSorted" :key="item.id">
-                                        <td class="text-left">{{item.date_received}}</td>
-                                        <td class="text-center">{{item.description}}</td>
-                                        <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
-                                    </tr>
-                                    </tbody>
-                                </q-markup-table>
-                            </div>
-                            <div class="col-md-5">
-                                <p class="text-h6 text-blue-12 row justify-center">Expenses</p>
-                                <q-markup-table>
-                                    <thead>
-                                    <tr>
-                                        <th class="text-left text-weight-bolder">
-                                            Date
-                                        </th>
-                                        <th class="text-center text-weight-bolder">
-                                            Description
-                                        </th>
-                                        <th class="text-right text-weight-bolder">
-                                            Expenses
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr v-for="item in expenseSorted" :key="item.id">
-                                        <td class="text-left">{{item.date_of_expense}}</td>
-                                        <td class="text-center">{{item.title}}</td>
-                                        <td class="text-right">&#8358; {{ formatNumber(item.amount)}}</td>
-                                    </tr>
-                                    </tbody>
-                                </q-markup-table>
-                            </div>
+                                            <span class="text-white text-h6"> {{formatNumber(Gxpenses)}}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
+
+                            </q-card>
                         </div>
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-blue-12">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-bolt fa-2x text-white"></i>
+                                        <span class=""> Total Income</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+
+                                            <span class="text-white text-h6">{{ formatNumber(Gincome)}}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
+                            </q-card>
+                        </div>
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-positive">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-chart-pie  fa-2x text-white"></i>
+                                        <span class=""> Total Profit</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+
+                                            <span class="text-white text-h6"> {{ formatNumber(Gprofit) }}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
+                            </q-card>
+                        </div>
+                      </div>
                     </div>
                 </div>
               </div>
@@ -310,20 +307,45 @@ export default {
         sortFormData: {
             sortFrom: "",
             sortTo: "",
+            expenseCateID: "",
+            customerName: "",
         },
         searchCustomers: "",
+        categories: "",
+        customers: "",
+        totalSearchExp: "",
+        totalSearchIncome: ""
     };
   },
   methods: {
-    // generateYear(){
-    //     var i;
-    //     var dat = new Date()
-    //     var year = dat.getFullYear();
-    //     var generated;
-    //     for (i = 1990; i <= year; i++) {
-    //        this.years.push(i)
-    //     }
-    // },
+    loadCategories() {
+      this.axios
+        .get("expense-category/all")
+        .then(res => {
+          console.log(res);
+          this.categories = res.data.data;
+          console.log(this.categories);
+          this.$store.commit("storeExpenseCategory", res.data.data);
+        })
+        .catch(err => {
+          //console.log(err.response);
+          if(err.response.status == 404){
+            console.log('No Category Found');
+          }
+        });
+    },
+    loadCustomers() {
+      this.axios
+        .get("customer/all")
+        .then(res => {
+          //console.log(res.data.data);
+          this.$store.commit("storeCustomers", res.data.data);
+          this.customers = this.$store.getters.customers;
+        })
+        .catch(err => {
+          console.log(err.response);
+        });
+    },
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
@@ -356,9 +378,7 @@ export default {
         }
     },
     sortReport(){
-        
         console.log(this.sortFormData);
-
         this.axios
         .post("report/generate", this.sortFormData)
         .then(res => {
@@ -367,6 +387,8 @@ export default {
                 this.expenseSorted = res.data.expenseData;
                 this.incomeSorted = res.data.incomeData;
                 this.openingBal = res.data.openingBal;
+                this.totalSearchExp = res.data.totalSearchExp;
+                this.totalSearchIncome = res.data.totalSearchIncome;
             }else{
                 this.$q.notify({
                     message: "There was no Transaction within this time frame, check your input",
@@ -374,14 +396,14 @@ export default {
                     type: "negative"
                 });
             }
-           
+
         })
         .catch(err => {
           console.log(err.status);
         });
     },
     getGrossReport(){
-             this.axios
+        this.axios
         .get("report/all")
         .then(res => {
             console.log(res)
@@ -395,6 +417,8 @@ export default {
     }
   },
   created() {
+    this.loadCustomers();
+    this.loadCategories();
     this.getGrossReport();
   },
   mounted() {

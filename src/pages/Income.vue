@@ -138,7 +138,7 @@
                       <template v-slot:loading>
                         <q-spinner />
                       </template>
-                  </q-btn>        
+                  </q-btn>
                 <q-btn
                   v-else
                   label="Update Income"
@@ -150,7 +150,7 @@
                   <template v-slot:loading>
                     <q-spinner />
                   </template>
-                </q-btn> 
+                </q-btn>
 
               </span>
             </q-card-section>
@@ -167,13 +167,17 @@
                   Income Record
                 </p>
                 <div class="sort-table">
-                  <q-input
-                    dense
-                    outlined
-                    type="text"
-                    v-model.trim="searchIncome"
-                    placeholder="Search"
-                  />
+                  <q-form class="row d-inline-flex " @submit.prevent="searchIncome">
+                    <q-input
+                    @change="checkInput"
+                      dense
+                      outlined
+                      type="text"
+                      v-model.trim="searchData"
+                      placeholder="Search"
+                    />
+                    <q-btn type="submit"  color="primary" label="Search" />
+                  </q-form>
                 </div>
               </div>
               <div class="table-data">
@@ -204,8 +208,38 @@
                         <th v-if="userRole == 1" class="text-center text-weight-bold">Action</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="searchMode == false">
                       <tr v-for="item in income" :key="item.id">
+                        <td class="text-left">{{item.source}}</td>
+                        <td class="text-center">{{item.description}}</td>
+                        <td class="text-right">&#8358; {{ formatNumber(item.amount)}}</td>
+                        <td class="text-center">{{item.vat_percentage}}</td>
+                         <td class="text-center">{{item.mop}}</td>
+                        <td class="text-center">{{item.date_received}}</td>
+                        <td class="text-right" v-if="userRole == 1">
+                          <span class="col-md-4 q-gutter-sm">
+                            <q-btn
+                            v-if="userRole == 1"
+                              @click="trigerEdit(item.id); editMode = true;"
+                              size="10px"
+                              label="Edit"
+                              class="bg-primary text-white"
+                            />
+                            <!-- <q-btn
+                              @click="trigerDelete()"
+                              size="10px"
+                              label="Delete"
+                              class="bg-red-10 text-white"
+                            /> -->
+                          </span>
+                        </td>
+                      </tr>
+                       <q-inner-loading :showing="visible">
+                        <q-spinner size="50px" color="primary" />
+                      </q-inner-loading>
+                    </tbody>
+                    <tbody v-if="searchMode">
+                      <tr v-for="item in searchResults" :key="item.id">
                         <td class="text-left">{{item.source}}</td>
                         <td class="text-center">{{item.description}}</td>
                         <td class="text-right">&#8358; {{ formatNumber(item.amount)}}</td>
@@ -254,11 +288,12 @@ export default {
   name: "home",
   data() {
     return {
+      searchMode: false,
       visible: false,
       nairaSign: "&#x20A6;",
       editMode: false,
       editSource: false,
-      searchIncome: "",
+      searchData: "",
       incomeSource: ["Customers", "Non Customers"],
       mop: ["Cash", "Bank Transfer", "Cheque"],
       vat: ['Yes', 'No'],
@@ -276,6 +311,7 @@ export default {
         date_received: "",
         mop: ""
       },
+      searchResults: "",
       loading: false,
       userRole: "",
     };
@@ -283,6 +319,32 @@ export default {
   methods: {
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    },
+    checkInput(event){
+      console.log(event.target.value.length);
+      if(!event.target.value.length){
+        this.searchMode = false;
+        this.loadIncome();
+      }
+    },
+    searchIncome(){
+      this.visible = true;
+      this.searchMode = true;
+      if(this.searchData.length){
+        console.log(this.searchData);
+        this.axios
+        .post("income/search", {searchdata: this.searchData})
+        .then(res => {
+            console.log(res);
+            this.searchResults = res.data.data;
+            this.visible = false;
+        })
+        .catch(err => {
+          console.log(err)
+        });
+
+      }
+
     },
     getIncomeSourceType(){
       let rawCustomers = this.$store.getters.customers;
@@ -361,6 +423,7 @@ export default {
       this.singleIncome = oneIncome;
     },
     loadIncome(){
+      this.searchMode = false;
       this.axios
         .get("income/all")
         .then( res => {
@@ -383,7 +446,7 @@ export default {
         .post("income/store", this.incomeFormData)
         .then(res => {
           console.log(res)
-          
+
           if (res.status == 200) {
             (this.incomeFormData.source = null),
               (this.incomeFormData.vat = null),
@@ -493,7 +556,7 @@ export default {
       this.userRole = this.$q.cookies.get('role');
       console.log(this.userRole);
     }
-    
+
 
   },
 
