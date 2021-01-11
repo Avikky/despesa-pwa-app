@@ -97,70 +97,43 @@
                     <hr>
                     <br>
                     <div class="justify-center" v-if=incomeMode>
-                        <q-markup-table>
-                            <thead>
-                                <tr>
-                                    <th class="text-left text-weight-bolder">
-                                    Income Source
-                                    </th>
-                                    <th class="text-right text-weight-bolder">
-                                    Description
-                                    </th>
-                                    <th class="text-center text-weight-bolder">
-                                    Amount
-                                    </th>
-                                    <th class="text-center text-weight-bolder">
-                                    VAT (%)
-                                    </th>
-                                    <th class="text-center text-weight-bold">
-                                    Method of payment
-                                    </th>
-                                    <th class="text-center text-weight-bold">
-                                    Date Received
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="item in incomeSorted" :key="item.id">
-                                <td class="text-left">{{item.source}}</td>
-                                <td class="text-center">{{item.description}}</td>
-                                <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
-                                <td class="text-center">{{item.vat_percentage}}</td>
-                                <td class="text-center">{{item.mop}}</td>
-                                <td class="text-center">{{item.date_received}}</td>
-                            </tr>
-                            </tbody>
-                        </q-markup-table>
+                      <q-table
+                        title="Expense Report"
+                        :columns="incomeColumns"
+                        :data="incomeSorted"
+                        color="primary"
+                        row-key="name"
+                      >
+                        <template v-slot:top-right>
+                          <q-btn
+                            color="primary"
+                            icon-right="archive"
+                            label="Export to csv"
+                            no-caps
+                            @click="exportIncomeTable"
+                          />
+                        </template>
+                      </q-table>
                     </div>
                     <div class="justify-center" v-if="expenseMode">
-                        <q-markup-table>
-                            <thead>
-                            <tr>
-                                <th class="text-left text-weight-bolder">Date</th>
-                                <th class="text-center text-weight-bolder">Title</th>
-                                <th class="text-center text-weight-bolder">Description</th>
-                                <th class="text-center text-weight-bolder">Made By</th>
-                                <th class="text-right text-weight-bolder">Amount</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="item in expenseSorted" :key="item.id">
-                                <td class="text-left">{{item.date_of_expense}}</td>
-                                <td class="text-center">{{item.title}}</td>
-                                <td class="text-center">{{item.description}}</td>
-                                <td class="text-center">{{item.made_by}}</td>
-                                <td class="text-right">&#8358; {{formatNumber(item.amount)}}</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                  <span style="font-size: 35px; font-weight: bolder;">ToTal: </span>
-                                  <span style="font-size: 20px; font-weight: bold;">&#8358;
-                                    {{formatNumber(totalSearchExp)}}
-                                  </span>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </q-markup-table>
+                      <q-table
+                        title="Expense Report"
+                        :columns="expenseColumns"
+                        :data="expenseSorted"
+                        color="primary"
+                        row-key="name"
+                      >
+                        <template v-slot:top-right>
+                          <q-btn
+                            color="primary"
+                            icon-right="archive"
+                            label="Export to csv"
+                            no-caps
+                            @click="exportExpenseTable"
+                          />
+                        </template>
+                      </q-table>
+
                     </div>
                     <div class="row justify-center" v-if="openingBalMode">
                         <q-markup-table>
@@ -290,9 +263,46 @@
 import * as store from "../store/users";
 // import axios from "axios";
 import { date } from "quasar";
+import { exportFile } from 'quasar'
+
+function wrapCsvValue (val, formatFn) {
+  let formatted = formatFn !== void 0
+    ? formatFn(val)
+    : val
+
+  formatted = formatted === void 0 || formatted === null
+    ? ''
+    : String(formatted)
+
+  formatted = formatted.split('"').join('""')
+  /**
+   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+   * Uncomment the next two lines to escape new lines
+   */
+  // .split('\n').join('\\n')
+  // .split('\r').join('\\r')
+
+  return `"${formatted}"`
+}
+
 export default {
   data() {
     return {
+      expenseColumns: [
+        { name: 'date_of_expense', align: 'left', label: 'Date', field: 'date_of_expense' },
+        { name: 'title', label: 'Title',align: 'center', field: 'title' },
+        { name: 'description', label: 'Description', align: 'center', field: 'description' },
+        { name: 'made_by', label: 'Made By', align: 'center', field: 'made_by' },
+        { name: 'amount', label: 'Amount', align: 'right', field: 'amount' },
+      ],
+      incomeColumns:  [
+        { name: 'source', align: 'left', label: 'Income Source', field: 'source' },
+        { name: 'description', label: 'Description', align: 'center', field: 'description' },
+        { name: 'amount', label: 'Amount', align: 'right', field: 'amount' },
+        { name: 'vat_percentage', label: 'Vat (%)', align: 'center', field: 'vat_percentage' },
+        { name: 'mop', label: 'Method of Payment', align: 'center', field: 'mop' },
+        { name: 'date_received', label: 'Date Receive', align: 'center', field: 'date_received' },
+      ],
         expenseMode: false,
         incomeMode: false,
         openingBalMode: false,
@@ -318,6 +328,56 @@ export default {
     };
   },
   methods: {
+    exportExpenseTable () {
+      // naive encoding to csv format
+      const content = [ this.expenseColumns.map(col => wrapCsvValue(col.label)) ].concat(
+        this.expenseSorted.map(row => this.expenseColumns.map(col => wrapCsvValue(
+          typeof col.field === 'function'
+            ? col.field(row)
+            : row[col.field === void 0 ? col.name : col.field],
+          col.format
+        )).join(','))
+      ).join('\r\n')
+
+      const status = exportFile(
+        'table-export.csv',
+        content,
+        'text/csv'
+      )
+
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Browser denied file download...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
+    },
+     exportIncomeTable () {
+      // naive encoding to csv format
+      const content = [ this.incomeColumns.map(col => wrapCsvValue(col.label)) ].concat(
+        this.incomeSorted.map(row => this.incomeColumns.map(col => wrapCsvValue(
+          typeof col.field === 'function'
+            ? col.field(row)
+            : row[col.field === void 0 ? col.name : col.field],
+          col.format
+        )).join(','))
+      ).join('\r\n')
+
+      const status = exportFile(
+        'table-export.csv',
+        content,
+        'text/csv'
+      )
+
+      if (status !== true) {
+        this.$q.notify({
+          message: 'Browser denied file download...',
+          color: 'negative',
+          icon: 'warning'
+        })
+      }
+    },
     loadCategories() {
       this.axios
         .get("expense-category/all")
@@ -389,6 +449,7 @@ export default {
                 this.openingBal = res.data.openingBal;
                 this.totalSearchExp = res.data.totalSearchExp;
                 this.totalSearchIncome = res.data.totalSearchIncome;
+                console.log(this.incomeSorted );
             }else{
                 this.$q.notify({
                     message: "There was no Transaction within this time frame, check your input",
@@ -406,7 +467,7 @@ export default {
         this.axios
         .get("report/all")
         .then(res => {
-            console.log(res)
+            console.log(res);
             this.Gxpenses = res.data.totalExpenses;
             this.Gincome = res.data.totalIncome;
             this.Gprofit = res.data.grossProfit;
