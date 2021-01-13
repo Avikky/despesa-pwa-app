@@ -112,7 +112,7 @@ const linksData = [
   {
     title: "Home",
     icon: "fas fa-chart-th",
-    link: "/home"
+    link: "/"
   },
   {
     title: "Income",
