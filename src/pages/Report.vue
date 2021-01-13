@@ -46,168 +46,210 @@
                 <q-separator class="q-my-sm" />
                 <!-- your main table data starts here -->
                 <div class="main-data">
-                  <q-form @submit.prevent="sortReport">
-                      <div class="row q-gutter-md justify-center">
-                          <div v-if="expenseMode" class="col-md-3">
-                              <label for="startDate">Select Expense Category</label><br>
-                                <select v-model="sortFormData.expenseCateID" style="padding: 12px;" name="expenseCategory" id="" >
-                                  <option v-for="category in categories" :key="category.id" :value="category.id">{{category.name}}</option>
-                                </select>
-                          </div>
-                          <div class="col-md-3">
-                              <label for="startDate">Start Date</label>
-                              <q-input
-                                  required
-                                  outlined
-                                  id="startDate"
-                                  dense
-                                  type="Date"
-                                  v-model="sortFormData.sortFrom"
-                              />
-                          </div>
-                          <div class="col-md-3">
-                              <label for="endDate">End Date</label>
-                              <q-input
-                                required
-                                outlined
-                                dense
-                                id="endDate"
-                                type="Date"
-                                v-model="sortFormData.sortTo"
-                              />
-                          </div>
-                          <div class="col-md-2">
-                              <q-btn
-                                  icon="sort"
-                                  label="Generate"
-                                  type="submit"
-                                  class="full-width bg-primary text-white q-mt-lg"
-                              />
-                          </div>
-                      </div>
-                  </q-form>
-                    <br v-if="generalMode" ><br v-if="generalMode" >
+                    <q-form v-if="!generalMode" @submit.prevent="sortReport">
+                        <div class="row q-gutter-md justify-center">
+                            <div v-if="expenseMode" class="col-md-3">
+                                <label for="startDate">Select Expense Category</label><br>
+                                 <select v-model="sortFormData.expenseCateID" style="padding: 12px;" name="expenseCategory" id="" >
+                                   <option v-for="category in categories" :key="category.id" :value="category.id">{{category.name}}</option>
+                                 </select>
+                            </div>
+                             <div v-if="incomeMode" class="col-md-3">
+                                <label for="startDate">Select Customer</label><br>
+                                 <select v-model="sortFormData.customerName" style="padding: 12px;" name="expenseCategory" id="" >
+                                   <option v-for="customer in customers" :key="customer.id" :value="customer.name">{{customer.name}}</option>
+                                 </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="startDate">Start Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    id="startDate"
+                                    dense
+                                    type="Date"
+                                    v-model="sortFormData.sortFrom"
+                                />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDate">End Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    dense
+                                    id="endDate"
+                                    type="Date"
+                                    v-model="sortFormData.sortTo"
+                                />
+                            </div>
+                            <div class="col-md-2">
+                                <q-btn
+                                    icon="sort"
+                                    label="Generate"
+                                    type="submit"
+                                    class="full-width bg-primary text-white q-mt-lg"
+                                />
+                            </div>
+                        </div>
+                    </q-form>
+                    <br><br>
                     <p v-if="generalMode" class="text-h6 text-blue-12 text-center">GROSS TOTAL</p>
                     <hr>
                     <br>
-                    <div v-if="generalMode" class="row q-gutter-md justify-center">
-                      <div class="col-md-3">
-                          <q-card class="my-card">
-                              <q-card-section class="bg-negative">
-                                  <p class="text-white  text-bold">
-                                      <i class="fas fa-chart-line fa-2x text-white"></i>
-                                      <span class=""> Total Expenses</span>
-                                  </p>
-                                  <hr>
-                                  <div class="text-subtitle1">
-                                      <p>
-                                          <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+                    <div class="justify-center" v-if=incomeMode>
+                      <q-table
+                        title="Expense Report"
+                        :columns="incomeColumns"
+                        :data="incomeSorted"
+                        color="primary"
+                        row-key="name"
+                      >
+                        <template v-slot:top-right>
+                          <q-btn
+                            color="primary"
+                            icon-right="archive"
+                            label="Export to csv"
+                            no-caps
+                            @click="exportIncomeTable"
+                          />
+                        </template>
+                      </q-table>
+                    </div>
+                    <div class="justify-center" v-if="expenseMode">
+                      <q-table
+                        title="Expense Report"
+                        :columns="expenseColumns"
+                        :data="expenseSorted"
+                        color="primary"
+                        row-key="name"
+                      >
+                        <template v-slot:top-right>
+                          <q-btn
+                            color="primary"
+                            icon-right="archive"
+                            label="Export to csv"
+                            no-caps
+                            @click="exportExpenseTable"
+                          />
+                        </template>
+                      </q-table>
 
-                                          <span class="text-white text-h6"> {{formatNumber(Gxpenses)}}</span>
-                                      </p>
-                                  </div>
-                              </q-card-section>
+                    </div>
+                    <div class="row justify-center" v-if="openingBalMode">
+                        <q-markup-table>
+                            <thead>
+                            <tr>
+                                <th class="text-left text-weight-bolder">
+                                    Date
+                                </th>
+                                <th class="text-center text-weight-bolder">
+                                    Amount
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in openingBal" :key="item.id">
+                                    <td class="text-left">{{item.date_created}}</td>
+                                    <td class="text-center">&#8358; {{item.amount}}</td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </q-markup-table>
+                    </div>
+                    <div v-if="generalMode">
+                      <q-form @submit.prevent="sortReport">
+                        <div class="row q-gutter-md justify-center">
+                            <div class="col-md-3">
+                                <label for="startDate">Start Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    id="startDate"
+                                    dense
+                                    type="Date"
+                                    v-model="sortFormData.sortFrom"
+                                />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDate">End Date</label>
+                                <q-input
+                                    required
+                                    outlined
+                                    dense
+                                    id="endDate"
+                                    type="Date"
+                                    v-model="sortFormData.sortTo"
+                                />
+                            </div>
+                            <div class="col-md-2">
+                                <q-btn
+                                    icon="sort"
+                                    label="Generate"
+                                    type="submit"
+                                    class="full-width bg-primary text-white q-mt-lg"
+                                />
+                            </div>
+                        </div>
+                      </q-form>
+                    <br><br>
+                      <div class="row q-gutter-md justify-center">
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-negative">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-chart-line fa-2x text-white"></i>
+                                        <span class=""> Total Expenses</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                          </q-card>
-                      </div>
-                      <div class="col-md-3">
-                          <q-card class="my-card">
-                              <q-card-section class="bg-blue-12">
-                                  <p class="text-white  text-bold">
-                                      <i class="fas fa-bolt fa-2x text-white"></i>
-                                      <span class=""> Total Income</span>
-                                  </p>
-                                  <hr>
-                                  <div class="text-subtitle1">
-                                      <p>
-                                          <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+                                            <span class="text-white text-h6"> {{formatNumber(Gxpenses)}}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
 
-                                          <span class="text-white text-h6">{{ formatNumber(Gincome)}}</span>
-                                      </p>
-                                  </div>
-                              </q-card-section>
-                          </q-card>
-                      </div>
-                      <div class="col-md-3">
-                          <q-card class="my-card">
-                              <q-card-section class="bg-positive">
-                                  <p class="text-white  text-bold">
-                                      <i class="fas fa-chart-pie  fa-2x text-white"></i>
-                                      <span class=""> Total Profit</span>
-                                  </p>
-                                  <hr>
-                                  <div class="text-subtitle1">
-                                      <p>
-                                          <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+                            </q-card>
+                        </div>
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-blue-12">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-bolt fa-2x text-white"></i>
+                                        <span class=""> Total Income</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
 
-                                          <span class="text-white text-h6"> {{ formatNumber(Gprofit) }}</span>
-                                      </p>
-                                  </div>
-                              </q-card-section>
-                          </q-card>
+                                            <span class="text-white text-h6">{{ formatNumber(Gincome)}}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
+                            </q-card>
+                        </div>
+                        <div class="col-md-3">
+                            <q-card class="my-card">
+                                <q-card-section class="bg-positive">
+                                    <p class="text-white  text-bold">
+                                        <i class="fas fa-chart-pie  fa-2x text-white"></i>
+                                        <span class=""> Total Profit</span>
+                                    </p>
+                                    <hr>
+                                    <div class="text-subtitle1">
+                                        <p>
+                                            <span class="text-white naira-sign medium-text" v-html="nairaSign"></span>
+
+                                            <span class="text-white text-h6"> {{ formatNumber(Gprofit) }}</span>
+                                        </p>
+                                    </div>
+                                </q-card-section>
+                            </q-card>
+                        </div>
                       </div>
                     </div>
-                  <div class="justify-center" v-if="incomeMode">
-                    <q-table
-                      title="Expense Report"
-                      :columns="incomeColumns"
-                      :data="incomeSorted"
-                      color="primary"
-                      row-key="name"
-                    >
-                      <template v-slot:top-right>
-                        <q-btn
-                          color="primary"
-                          icon-right="archive"
-                          label="Export to csv"
-                          no-caps
-                          @click="exportIncomeTable"
-                        />
-                      </template>
-                    </q-table>
-                  </div>
-                  <div class="justify-center" v-if="expenseMode">
-                    <q-table
-                      title="Expense Report"
-                      :columns="expenseColumns"
-                      :data="expenseSorted"
-                      color="primary"
-                      row-key="name"
-                    >
-                      <template v-slot:top-right>
-                        <q-btn
-                          color="primary"
-                          icon-right="archive"
-                          label="Export to csv"
-                          no-caps
-                          @click="exportExpenseTable"
-                        />
-                      </template>
-                    </q-table>
-
-                  </div>
-                  <div class="row justify-center" v-if="openingBalMode">
-                      <q-markup-table>
-                          <thead>
-                          <tr>
-                              <th class="text-left text-weight-bolder">
-                                  Date
-                              </th>
-                              <th class="text-center text-weight-bolder">
-                                  Amount
-                              </th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                              <tr v-for="item in openingBal" :key="item.id">
-                                  <td class="text-left">{{item.date_created}}</td>
-                                  <td class="text-center">&#8358; {{item.amount}}</td>
-                              </tr>
-                              <tr></tr>
-                          </tbody>
-                      </q-markup-table>
-                  </div>
-
                 </div>
               </div>
             </div>
@@ -276,6 +318,7 @@ export default {
             sortFrom: "",
             sortTo: "",
             expenseCateID: "",
+            customerName: "",
         },
         searchCustomers: "",
         categories: "",
@@ -351,37 +394,35 @@ export default {
           }
         });
     },
-    // loadCustomers() {
-    //   this.axios
-    //     .get("customer/all")
-    //     .then(res => {
-    //       //console.log(res.data.data);
-    //       this.$store.commit("storeCustomers", res.data.data);
-    //       this.customers = this.$store.getters.customers;
-    //     })
-    //     .catch(err => {
-    //       console.log(err.response);
-    //     });
-    // },
+    loadCustomers() {
+      this.axios
+        .get("customer/all")
+        .then(res => {
+          //console.log(res.data.data);
+          this.$store.commit("storeCustomers", res.data.data);
+          this.customers = this.$store.getters.customers;
+        })
+        .catch(err => {
+          console.log(err.response);
+        });
+    },
     formatNumber(num) {
-      if(num){
-        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-      }
+      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
     switchTab(value){
         console.log(value)
-        console.log(this.generalMode)
         if(value == 'expense'){
             this.expenseMode = true;
             this.incomeMode = false;
             this.openingBalMode =  false;
             this.generalMode =  false;
+
         }
         if(value == 'general'){
-          this.expenseMode = false;
-          this.incomeMode = false;
-          this.openingBalMode =  false;
-          this.generalMode =  true;
+            this.expenseMode = false;
+            this.incomeMode = false;
+            this.openingBalMode =  false;
+            this.generalMode =  true;
         }
         if(value == 'income'){
             this.expenseMode = false;
@@ -402,13 +443,16 @@ export default {
         .post("report/generate", this.sortFormData)
         .then(res => {
             //console.log(res)
-            if(res.data.expenseData.length || res.data.incomeData.length){
+            if(res.data){
                 this.expenseSorted = res.data.expenseData;
                 this.incomeSorted = res.data.incomeData;
                 this.openingBal = res.data.openingBal;
                 this.totalSearchExp = res.data.totalSearchExp;
                 this.totalSearchIncome = res.data.totalSearchIncome;
-                console.log(this.incomeSorted );
+                this.Gxpenses = res.data.totalExpenses;
+                this.Gincome = res.data.totalIncome;
+                this.Gprofit = res.data.grossProfit;
+
             }else{
                 this.$q.notify({
                     message: "There was no Transaction within this time frame, check your input",
@@ -437,6 +481,7 @@ export default {
     }
   },
   created() {
+    this.loadCustomers();
     this.loadCategories();
     this.getGrossReport();
   },
