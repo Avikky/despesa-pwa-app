@@ -157,7 +157,7 @@ module.exports = function (  ctx  ) {
             type: 'image/png'
           }
         ],
-        
+
       }
     },
 

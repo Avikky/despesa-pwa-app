@@ -54,12 +54,6 @@
                                    <option v-for="category in categories" :key="category.id" :value="category.id">{{category.name}}</option>
                                  </select>
                             </div>
-                             <div v-if="incomeMode" class="col-md-3">
-                                <label for="startDate">Select Customer</label><br>
-                                 <select v-model="sortFormData.customerName" style="padding: 12px;" name="expenseCategory" id="" >
-                                   <option v-for="customer in customers" :key="customer.id" :value="customer.name">{{customer.name}}</option>
-                                 </select>
-                            </div>
                             <div class="col-md-3">
                                 <label for="startDate">Start Date</label>
                                 <q-input
@@ -318,7 +312,6 @@ export default {
             sortFrom: "",
             sortTo: "",
             expenseCateID: "",
-            customerName: "",
         },
         searchCustomers: "",
         categories: "",
@@ -394,18 +387,18 @@ export default {
           }
         });
     },
-    loadCustomers() {
-      this.axios
-        .get("customer/all")
-        .then(res => {
-          //console.log(res.data.data);
-          this.$store.commit("storeCustomers", res.data.data);
-          this.customers = this.$store.getters.customers;
-        })
-        .catch(err => {
-          console.log(err.response);
-        });
-    },
+    // loadCustomers() {
+    //   this.axios
+    //     .get("customer/all")
+    //     .then(res => {
+    //       //console.log(res.data.data);
+    //       this.$store.commit("storeCustomers", res.data.data);
+    //       this.customers = this.$store.getters.customers;
+    //     })
+    //     .catch(err => {
+    //       console.log(err.response);
+    //     });
+    // },
     formatNumber(num) {
       return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
     },
@@ -443,7 +436,7 @@ export default {
         .post("report/generate", this.sortFormData)
         .then(res => {
             //console.log(res)
-            if(res.data.expenseData.length){
+            if(res.data.expenseData.length || res.data.incomeData.length){
                 this.expenseSorted = res.data.expenseData;
                 this.incomeSorted = res.data.incomeData;
                 this.openingBal = res.data.openingBal;
@@ -478,7 +471,6 @@ export default {
     }
   },
   created() {
-    this.loadCustomers();
     this.loadCategories();
     this.getGrossReport();
   },
